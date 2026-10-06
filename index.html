@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Melbourne public transport recovery</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+</head>
+<body>
+  <h1>Melbourne's network recovered its riders, not its rhythm</h1>
+  <div id="sa3_map"></div>
+  <div id="slopegraph"></div>
+
+  <script>
+    vegaEmbed('#sa3_map', 'js/sa3_map.vg.json', {actions: false});
+    vegaEmbed('#slopegraph', 'js/slopegraph.vg.json', {actions: false});
+  </script>
+</body>
+</html>
