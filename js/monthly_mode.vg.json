@@ -1,8 +1,8 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "title": {
-    "text": "Metropolitan patronage by mode, indexed to 2019",
-    "subtitle": "Monthly patronage as a percentage of each mode's 2019 monthly average"
+    "text": "Metropolitan patronage by mode",
+    "subtitle": "Monthly boardings in millions. Dashed lines show each mode's 2019 monthly average."
   },
   "width": 600,
   "height": 300,
@@ -23,35 +23,36 @@
     {"filter": "datum.Year >= 2018"},
     {"fold": ["Metropolitan train", "Metropolitan tram", "Metropolitan bus"], "as": ["mode", "pax"]},
     {"calculate": "datetime(datum.Year, datum.Month - 1, 1)", "as": "date"},
-    {"calculate": "datum.Year == 2019 ? datum.pax : null", "as": "base"},
-    {"joinaggregate": [{"op": "mean", "field": "base", "as": "base2019"}], "groupby": ["mode"]},
-    {"calculate": "datum.pax / datum.base2019 * 100", "as": "index"}
+    {"calculate": "datum.pax / 1000000", "as": "pax_m"},
+    {"calculate": "datum.mode == 'Metropolitan train' ? 'Train' : datum.mode == 'Metropolitan tram' ? 'Tram' : 'Bus'", "as": "mode_label"}
   ],
+  "encoding": {
+    "color": {
+      "field": "mode_label",
+      "type": "nominal",
+      "title": null,
+      "scale": {"domain": ["Train", "Tram", "Bus"], "range": ["#0072CE", "#78BE20", "#FF8200"]},
+      "legend": {"orient": "top", "direction": "horizontal"}
+    }
+  },
   "layer": [
     {
-      "data": {"values": [{}]},
-      "mark": {"type": "rule", "strokeDash": [4, 4], "color": "#888"},
-      "encoding": {"y": {"datum": 100}}
+      "transform": [
+        {"filter": "datum.Year == 2019"},
+        {"aggregate": [{"op": "mean", "field": "pax_m", "as": "avg2019"}], "groupby": ["mode_label"]}
+      ],
+      "mark": {"type": "rule", "strokeDash": [4, 4], "opacity": 0.6},
+      "encoding": {"y": {"field": "avg2019", "type": "quantitative"}}
     },
     {
       "mark": {"type": "line", "strokeWidth": 2},
       "encoding": {
         "x": {"field": "date", "type": "temporal", "title": null, "axis": {"format": "%Y"}},
-        "y": {"field": "index", "type": "quantitative", "title": "Index (2019 = 100)"},
-        "color": {
-          "field": "mode",
-          "type": "nominal",
-          "title": null,
-          "scale": {
-            "domain": ["Metropolitan train", "Metropolitan tram", "Metropolitan bus"],
-            "range": ["#0072CE", "#78BE20", "#FF8200"]
-          }
-        },
+        "y": {"field": "pax_m", "type": "quantitative", "title": "Monthly patronage (millions)"},
         "tooltip": [
-          {"field": "mode", "type": "nominal", "title": "Mode"},
+          {"field": "mode_label", "type": "nominal", "title": "Mode"},
           {"field": "date", "type": "temporal", "format": "%b %Y", "title": "Month"},
-          {"field": "index", "type": "quantitative", "format": ".0f", "title": "Index"},
-          {"field": "pax", "type": "quantitative", "format": ",", "title": "Patronage"}
+          {"field": "pax", "type": "quantitative", "format": ",", "title": "Boardings"}
         ]
       }
     }

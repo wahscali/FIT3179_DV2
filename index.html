@@ -10,12 +10,16 @@
 </head>
 <body>
   <h1>Melbourne's network recovered its riders, not its rhythm</h1>
-  <div id="sa3_map"></div>
-  <div id="slopegraph"></div>
+
+  <div id="monthly_mode"></div>
+
+  <div id="station_map"></div>
 
   <script>
-    vegaEmbed('#sa3_map', 'js/sa3_map.vg.json', {actions: false});
-    vegaEmbed('#slopegraph', 'js/slopegraph.vg.json', {actions: false});
+    vegaEmbed('#monthly_mode', 'js/monthly_mode.vg.json', {actions: false})
+      .catch(console.error);
+    vegaEmbed('#station_map', 'js/station_map.vg.json', {actions: false})
+      .catch(console.error);
   </script>
 </body>
 </html>
