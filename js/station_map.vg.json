@@ -1,107 +1,243 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "title": {
-    "text": "The south-east corridor gained ground while the north-east fell behind",
-    "subtitle": "Station entries FY2024-25. Colour compares each station's change since FY2018-19 with the network as a whole (-23%)."
-  },
-  "resolve": {"scale": {"color": "shared", "size": "shared"}},
-  "hconcat": [
+  "params": [
     {
-      "width": 560,
-      "height": 420,
-      "projection": {"type": "mercator", "center": [145.05, -37.85], "scale": 28000, "translate": [280, 210]},
-      "layer": [
+      "name": "view",
+      "value": "20 busiest stations",
+      "bind": {
+        "input": "select",
+        "options": ["20 busiest stations", "20 biggest gains", "20 biggest losses"],
+        "name": "Show: "
+      }
+    },
+    {
+      "name": "pick",
+      "select": {"type": "point", "fields": ["Stop_ID"], "on": "click", "clear": "dblclick"},
+      "views": ["map_stations", "city_stations", "dumbbell_dots"]
+    }
+  ],
+  "resolve": {"scale": {"color": "independent", "size": "independent"}},
+  "vconcat": [
+    {
+      "title": {
+        "text": "The south-east corridor gained ground while the north-east fell behind",
+        "subtitle": [
+          "Station entries FY2024-25. Colour compares each station's change since FY2018-19 with the network as a whole (-23%).",
+          "Click a station to highlight it in the maps and the chart below. Double click to clear."
+        ]
+      },
+      "resolve": {"scale": {"color": "shared", "size": "shared"}},
+      "hconcat": [
         {
-          "data": {"url": "data/melb_sa3.topojson", "format": {"type": "topojson", "feature": "melb_sa3"}},
-          "mark": {"type": "geoshape", "fill": "#f7f7f7", "stroke": "white", "strokeWidth": 0.5, "clip": true}
+          "width": 560,
+          "height": 420,
+          "projection": {"type": "mercator", "center": [145.05, -37.85], "scale": 28000, "translate": [280, 210]},
+          "layer": [
+            {
+              "name": "map_regions",
+              "data": {"url": "data/melb_sa3.topojson", "format": {"type": "topojson", "feature": "melb_sa3"}},
+              "mark": {"type": "geoshape", "fill": "#f7f7f7", "stroke": "white", "strokeWidth": 0.5, "clip": true}
+            },
+            {
+              "name": "map_lines",
+              "data": {"url": "data/metro_lines.topojson", "format": {"type": "topojson", "feature": "lines"}},
+              "mark": {"type": "geoshape", "filled": false, "stroke": "#8c8c8c", "strokeWidth": 1.5, "clip": true}
+            },
+            {
+              "name": "map_inset_box",
+              "data": {"values": [{"type": "Feature", "geometry": {"type": "LineString", "coordinates": [[144.935, -37.800], [145.005, -37.800], [145.005, -37.830], [144.935, -37.830], [144.935, -37.800]]}}]},
+              "mark": {"type": "geoshape", "filled": false, "stroke": "#333333", "strokeWidth": 1}
+            },
+            {
+              "name": "map_stations",
+              "data": {"url": "data/station_change.csv"},
+              "transform": [{"filter": "!(datum.Stop_long > 144.935 && datum.Stop_long < 145.005 && datum.Stop_lat < -37.800 && datum.Stop_lat > -37.830)"}],
+              "mark": {"type": "circle", "clip": true},
+              "encoding": {
+                "longitude": {"field": "Stop_long", "type": "quantitative"},
+                "latitude": {"field": "Stop_lat", "type": "quantitative"},
+                "size": {"field": "pax_2025", "type": "quantitative", "title": "Annual entries", "scale": {"range": [20, 350]}, "legend": {"format": "~s", "values": [500000, 2000000, 10000000]}},
+                "color": {"field": "rel", "type": "quantitative", "title": "Change vs network", "scale": {"scheme": "redblue", "domainMid": 0, "domain": [-0.3, 0.3], "clamp": true}, "legend": {"format": "+.0%"}},
+                "order": {"field": "pax_2025", "sort": "descending"},
+                "stroke": {"condition": {"param": "pick", "empty": false, "value": "#111111"}, "value": "white"},
+                "strokeWidth": {"condition": {"param": "pick", "empty": false, "value": 3}, "value": 0.3},
+                "opacity": {"condition": {"param": "pick", "value": 0.95}, "value": 0.3},
+                "tooltip": [
+                  {"field": "Stop_name", "title": "Station"},
+                  {"field": "pax_2025", "type": "quantitative", "format": ",", "title": "Entries FY2024-25"},
+                  {"field": "pax_2019", "type": "quantitative", "format": ",", "title": "Entries FY2018-19"},
+                  {"field": "change", "type": "quantitative", "format": "+.0%", "title": "Change"}
+                ]
+              }
+            }
+          ]
         },
         {
-          "data": {"url": "data/metro_lines.topojson", "format": {"type": "topojson", "feature": "lines"}},
-          "mark": {"type": "geoshape", "filled": false, "stroke": "#8c8c8c", "strokeWidth": 1.5, "clip": true}
-        },
-        {
-          "data": {"values": [{"type": "Feature", "geometry": {"type": "LineString", "coordinates": [[144.935, -37.800], [145.005, -37.800], [145.005, -37.830], [144.935, -37.830], [144.935, -37.800]]}}]},
-          "mark": {"type": "geoshape", "filled": false, "stroke": "#333333", "strokeWidth": 1}
-        },
-        {
-          "data": {"url": "data/station_change.csv"},
-          "transform": [{"filter": "!(datum.Stop_long > 144.935 && datum.Stop_long < 145.005 && datum.Stop_lat < -37.800 && datum.Stop_lat > -37.830)"}],
-          "mark": {"type": "circle", "stroke": "white", "strokeWidth": 0.3, "opacity": 0.95, "clip": true},
-          "encoding": {
-            "longitude": {"field": "Stop_long", "type": "quantitative"},
-            "latitude": {"field": "Stop_lat", "type": "quantitative"},
-            "size": {"field": "pax_2025", "type": "quantitative", "title": "Annual entries", "scale": {"range": [20, 350]}, "legend": {"format": "~s", "values": [500000, 2000000, 10000000]}},
-            "color": {"field": "rel", "type": "quantitative", "title": "Change vs network", "scale": {"scheme": "redblue", "domainMid": 0, "domain": [-0.3, 0.3], "clamp": true}, "legend": {"format": "+.0%"}},
-            "order": {"field": "pax_2025", "sort": "descending"},
-            "tooltip": [
-              {"field": "Stop_name", "title": "Station"},
-              {"field": "pax_2025", "type": "quantitative", "format": ",", "title": "Entries FY2024-25"},
-              {"field": "pax_2019", "type": "quantitative", "format": ",", "title": "Entries FY2018-19"},
-              {"field": "change", "type": "quantitative", "format": "+.0%", "title": "Change"}
-            ]
-          }
+          "title": {"text": "City detail", "fontSize": 12},
+          "width": 300,
+          "height": 300,
+          "projection": {"type": "mercator", "center": [144.97, -37.815], "scale": 250000, "translate": [150, 150]},
+          "layer": [
+            {
+              "name": "city_regions",
+              "data": {"url": "data/melb_sa3.topojson", "format": {"type": "topojson", "feature": "melb_sa3"}},
+              "mark": {"type": "geoshape", "fill": "#f7f7f7", "stroke": "white", "strokeWidth": 0.5, "clip": true}
+            },
+            {
+              "name": "city_lines",
+              "data": {"url": "data/metro_lines.topojson", "format": {"type": "topojson", "feature": "lines"}},
+              "mark": {"type": "geoshape", "filled": false, "stroke": "#8c8c8c", "strokeWidth": 2, "clip": true}
+            },
+            {
+              "name": "city_stations",
+              "data": {"url": "data/station_change.csv"},
+              "mark": {"type": "circle", "clip": true},
+              "encoding": {
+                "longitude": {"field": "Stop_long", "type": "quantitative"},
+                "latitude": {"field": "Stop_lat", "type": "quantitative"},
+                "size": {"field": "pax_2025", "type": "quantitative"},
+                "color": {"field": "rel", "type": "quantitative"},
+                "order": {"field": "pax_2025", "sort": "descending"},
+                "stroke": {"condition": {"param": "pick", "empty": false, "value": "#111111"}, "value": "white"},
+                "strokeWidth": {"condition": {"param": "pick", "empty": false, "value": 3}, "value": 0.5},
+                "opacity": {"condition": {"param": "pick", "value": 0.95}, "value": 0.3},
+                "tooltip": [
+                  {"field": "Stop_name", "title": "Station"},
+                  {"field": "pax_2025", "type": "quantitative", "format": ",", "title": "Entries FY2024-25"},
+                  {"field": "pax_2019", "type": "quantitative", "format": ",", "title": "Entries FY2018-19"},
+                  {"field": "change", "type": "quantitative", "format": "+.0%", "title": "Change"}
+                ]
+              }
+            },
+            {
+              "name": "city_labels_right",
+              "data": {"url": "data/station_change.csv"},
+              "transform": [{"filter": "datum.label_side == 'right'"}],
+              "mark": {"type": "text", "align": "left", "dx": 7, "fontSize": 8, "clip": true},
+              "encoding": {
+                "longitude": {"field": "Stop_long", "type": "quantitative"},
+                "latitude": {"field": "Stop_lat", "type": "quantitative"},
+                "text": {"field": "Stop_name"}
+              }
+            },
+            {
+              "name": "city_labels_left",
+              "data": {"url": "data/station_change.csv"},
+              "transform": [{"filter": "datum.label_side == 'left'"}],
+              "mark": {"type": "text", "align": "right", "dx": -7, "fontSize": 8, "clip": true},
+              "encoding": {
+                "longitude": {"field": "Stop_long", "type": "quantitative"},
+                "latitude": {"field": "Stop_lat", "type": "quantitative"},
+                "text": {"field": "Stop_name"}
+              }
+            },
+            {
+              "name": "city_labels_top",
+              "data": {"url": "data/station_change.csv"},
+              "transform": [{"filter": "datum.label_side == 'top'"}],
+              "mark": {"type": "text", "dy": -11, "fontSize": 8, "clip": true},
+              "encoding": {
+                "longitude": {"field": "Stop_long", "type": "quantitative"},
+                "latitude": {"field": "Stop_lat", "type": "quantitative"},
+                "text": {"field": "Stop_name"}
+              }
+            }
+          ]
         }
       ]
     },
     {
-      "title": {"text": "City detail", "fontSize": 12},
-      "width": 300,
-      "height": 300,
-      "projection": {"type": "mercator", "center": [144.97, -37.815], "scale": 250000, "translate": [150, 150]},
+      "title": {
+        "text": {"expr": "view == '20 busiest stations' ? \"Melbourne's 20 busiest stations, before and after\" : view == '20 biggest gains' ? 'The 20 stations with the biggest gains, before and after' : 'The 20 stations with the biggest losses, before and after'"},
+        "subtitle": {"expr": "view == '20 busiest stations' ? ['Annual station entries in FY2018-19 and FY2024-25.', 'CBD stations count entries only, so most of their trips are homeward.', 'Log scale: equal line lengths mean equal percentage change.'] : ['Annual station entries in FY2018-19 and FY2024-25.', 'Only stations with at least 500,000 entries in FY2018-19 are included.', 'Log scale: equal line lengths mean equal percentage change.']"}
+      },
+      "width": 520,
+      "height": {"step": 22},
+      "data": {
+        "url": "data/station_change.csv",
+        "format": {"type": "csv", "parse": {"pax_2019": "number", "pax_2025": "number", "change": "number"}}
+      },
+      "transform": [
+        {"calculate": "datum.pax_2019 >= 500000", "as": "big"},
+        {
+          "window": [{"op": "row_number", "as": "rank_busy"}],
+          "sort": [{"field": "pax_2019", "order": "descending"}]
+        },
+        {
+          "window": [{"op": "row_number", "as": "rank_gain"}],
+          "groupby": ["big"],
+          "sort": [{"field": "change", "order": "descending"}]
+        },
+        {
+          "window": [{"op": "row_number", "as": "rank_loss"}],
+          "groupby": ["big"],
+          "sort": [{"field": "change", "order": "ascending"}]
+        },
+        {"calculate": "view == '20 busiest stations' ? datum.rank_busy : view == '20 biggest gains' ? datum.rank_gain : datum.rank_loss", "as": "order"},
+        {"filter": "(view == '20 busiest stations' && datum.rank_busy <= 20) || (view == '20 biggest gains' && datum.big && datum.rank_gain <= 20) || (view == '20 biggest losses' && datum.big && datum.rank_loss <= 20)"}
+      ],
+      "encoding": {
+        "y": {
+          "field": "Stop_name",
+          "type": "nominal",
+          "sort": {"field": "order", "op": "min", "order": "ascending"},
+          "title": null
+        },
+        "opacity": {"condition": {"param": "pick", "value": 1}, "value": 0.3}
+      },
       "layer": [
         {
-          "data": {"url": "data/melb_sa3.topojson", "format": {"type": "topojson", "feature": "melb_sa3"}},
-          "mark": {"type": "geoshape", "fill": "#f7f7f7", "stroke": "white", "strokeWidth": 0.5, "clip": true}
-        },
-        {
-          "data": {"url": "data/metro_lines.topojson", "format": {"type": "topojson", "feature": "lines"}},
-          "mark": {"type": "geoshape", "filled": false, "stroke": "#8c8c8c", "strokeWidth": 2, "clip": true}
-        },
-        {
-          "data": {"url": "data/station_change.csv"},
-          "mark": {"type": "circle", "stroke": "white", "strokeWidth": 0.5, "opacity": 0.95, "clip": true},
+          "name": "dumbbell_rules",
+          "mark": {"type": "rule", "color": "#c8c8c8", "strokeWidth": 2},
           "encoding": {
-            "longitude": {"field": "Stop_long", "type": "quantitative"},
-            "latitude": {"field": "Stop_lat", "type": "quantitative"},
-            "size": {"field": "pax_2025", "type": "quantitative"},
-            "color": {"field": "rel", "type": "quantitative"},
-            "order": {"field": "pax_2025", "sort": "descending"},
+            "x": {
+              "field": "pax_2019",
+              "type": "quantitative",
+              "title": "Annual station entries",
+              "scale": {"type": "log", "nice": false},
+              "axis": {"format": "~s", "values": [300000, 500000, 700000, 1000000, 1500000, 2000000, 3000000, 5000000, 7000000, 10000000, 15000000, 20000000]}
+            },
+            "x2": {"field": "pax_2025"}
+          }
+        },
+        {
+          "name": "dumbbell_dots",
+          "transform": [{"fold": ["pax_2019", "pax_2025"], "as": ["year", "entries"]}],
+          "mark": {"type": "circle", "size": 90},
+          "encoding": {
+            "x": {
+              "field": "entries",
+              "type": "quantitative",
+              "title": "Annual station entries",
+              "scale": {"type": "log", "nice": false},
+              "axis": {"format": "~s", "values": [300000, 500000, 700000, 1000000, 1500000, 2000000, 3000000, 5000000, 7000000, 10000000, 15000000, 20000000]}
+            },
+            "color": {
+              "field": "year",
+              "type": "nominal",
+              "scale": {"domain": ["pax_2019", "pax_2025"], "range": ["#b0b0b0", "#2b5c8a"]},
+              "legend": {
+                "title": null,
+                "orient": "top",
+                "labelExpr": "datum.label == 'pax_2019' ? 'FY2018-19' : 'FY2024-25'"
+              }
+            },
+            "stroke": {"condition": {"param": "pick", "empty": false, "value": "#111111"}, "value": "transparent"},
+            "strokeWidth": {"condition": {"param": "pick", "empty": false, "value": 3}, "value": 0},
             "tooltip": [
               {"field": "Stop_name", "title": "Station"},
-              {"field": "pax_2025", "type": "quantitative", "format": ",", "title": "Entries FY2024-25"},
               {"field": "pax_2019", "type": "quantitative", "format": ",", "title": "Entries FY2018-19"},
+              {"field": "pax_2025", "type": "quantitative", "format": ",", "title": "Entries FY2024-25"},
               {"field": "change", "type": "quantitative", "format": "+.0%", "title": "Change"}
             ]
           }
         },
         {
-          "data": {"url": "data/station_change.csv"},
-          "transform": [{"filter": "datum.label_side == 'right'"}],
-          "mark": {"type": "text", "align": "left", "dx": 7, "fontSize": 8, "clip": true},
+          "name": "dumbbell_labels",
+          "mark": {"type": "text", "align": "left", "fontSize": 11},
           "encoding": {
-            "longitude": {"field": "Stop_long", "type": "quantitative"},
-            "latitude": {"field": "Stop_lat", "type": "quantitative"},
-            "text": {"field": "Stop_name"}
-          }
-        },
-        {
-          "data": {"url": "data/station_change.csv"},
-          "transform": [{"filter": "datum.label_side == 'left'"}],
-          "mark": {"type": "text", "align": "right", "dx": -7, "fontSize": 8, "clip": true},
-          "encoding": {
-            "longitude": {"field": "Stop_long", "type": "quantitative"},
-            "latitude": {"field": "Stop_lat", "type": "quantitative"},
-            "text": {"field": "Stop_name"}
-          }
-        },
-        {
-          "data": {"url": "data/station_change.csv"},
-          "transform": [{"filter": "datum.label_side == 'top'"}],
-          "mark": {"type": "text", "dy": -11, "fontSize": 8, "clip": true},
-          "encoding": {
-            "longitude": {"field": "Stop_long", "type": "quantitative"},
-            "latitude": {"field": "Stop_lat", "type": "quantitative"},
-            "text": {"field": "Stop_name"}
+            "x": {"value": 530},
+            "text": {"field": "change", "type": "quantitative", "format": "+.0%"}
           }
         }
       ]

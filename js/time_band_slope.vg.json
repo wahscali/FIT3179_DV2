@@ -1,17 +1,30 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "title": {
-  "text": "Weekday travel by time of day, before and after",
-  "subtitle": [
-    "Entries on an average normal weekday (excluding school holidays), all metro stations combined.",
-    " ",
-    "Pre-AM peak: midnight to 7am    AM peak: 7am to 9:30am    Interpeak: 9:30am to 3pm",
-    "PM peak: 3pm to 7pm    PM late: 7pm to midnight"
-  ],
-  "subtitlePadding": 6
-},
+    "text": {
+      "expr": "view == 'Time of day' ? 'Weekday travel by time of day, before and after' : 'Travel by day of week, before and after'"
+    },
+    "subtitle": {
+      "expr": "view == 'Time of day' ? ['Entries on an average normal weekday (excluding school holidays), all metro stations combined.', ' ', 'Pre-AM peak: midnight to 7am    AM peak: 7am to 9:30am    Interpeak: 9:30am to 3pm', 'PM peak: 3pm to 7pm    PM late: 7pm to midnight'] : ['Entries on an average weekday, Saturday and Sunday, all metro stations combined.', ' ', ' ', ' ']"
+    },
+    "subtitlePadding": 6
+  },
   "width": 300,
   "height": 380,
+  "params": [
+    {
+      "name": "view",
+      "value": "Time of day",
+      "bind": {
+        "input": "radio",
+        "options": [
+          "Time of day",
+          "Day of week"
+        ],
+        "name": "Compare by: "
+      }
+    }
+  ],
   "data": {
     "url": "data/station_entries.csv",
     "format": {
@@ -21,7 +34,10 @@
         "Pax_AM_peak": "number",
         "Pax_interpeak": "number",
         "Pax_PM_peak": "number",
-        "Pax_PM_late": "number"
+        "Pax_PM_late": "number",
+        "Pax_weekday": "number",
+        "Pax_Saturday": "number",
+        "Pax_Sunday": "number"
       }
     }
   },
@@ -35,7 +51,10 @@
         "Pax_AM_peak",
         "Pax_interpeak",
         "Pax_PM_peak",
-        "Pax_PM_late"
+        "Pax_PM_late",
+        "Pax_weekday",
+        "Pax_Saturday",
+        "Pax_Sunday"
       ],
       "as": [
         "band_field",
@@ -56,7 +75,14 @@
       ]
     },
     {
-      "calculate": "datum.band_field == 'Pax_pre_AM_peak' ? 'Pre-AM peak' : datum.band_field == 'Pax_AM_peak' ? 'AM peak' : datum.band_field == 'Pax_interpeak' ? 'Interpeak' : datum.band_field == 'Pax_PM_peak' ? 'PM peak' : 'PM late'",
+      "calculate": "datum.band_field == 'Pax_weekday' || datum.band_field == 'Pax_Saturday' || datum.band_field == 'Pax_Sunday' ? 'Day of week' : 'Time of day'",
+      "as": "group"
+    },
+    {
+      "filter": "datum.group == view"
+    },
+    {
+      "calculate": "{'Pax_pre_AM_peak': 'Pre-AM peak', 'Pax_AM_peak': 'AM peak', 'Pax_interpeak': 'Interpeak', 'Pax_PM_peak': 'PM peak', 'Pax_PM_late': 'PM late', 'Pax_weekday': 'Weekday', 'Pax_Saturday': 'Saturday', 'Pax_Sunday': 'Sunday'}[datum.band_field]",
       "as": "band"
     },
     {
@@ -99,7 +125,7 @@
     "y": {
       "field": "entries",
       "type": "quantitative",
-      "title": "Weekday entries",
+      "title": "Average daily entries",
       "axis": {
         "format": "~s"
       }
@@ -113,21 +139,59 @@
           "AM peak",
           "Interpeak",
           "PM peak",
-          "PM late"
+          "PM late",
+          "Weekday",
+          "Saturday",
+          "Sunday"
         ],
         "range": [
           "#8c8c8c",
           "#b2182b",
           "#2166ac",
           "#e08214",
-          "#5e3c99"
+          "#5e3c99",
+          "#1b7837",
+          "#c51b7d",
+          "#8c510a"
         ]
       },
       "legend": null
+    },
+    "opacity": {
+      "condition": {
+        "test": {
+          "and": [
+            {
+              "param": "hover_line"
+            },
+            {
+              "param": "hover_point"
+            },
+            {
+              "param": "hover_label"
+            }
+          ]
+        },
+        "value": 1
+      },
+      "value": 0.2
     }
   },
   "layer": [
     {
+      "params": [
+        {
+          "name": "hover_line",
+          "select": {
+            "type": "point",
+            "fields": [
+              "band"
+            ],
+            "on": "pointerover",
+            "clear": "pointerout"
+          }
+        }
+      ],
       "mark": {
         "type": "line",
         "strokeWidth": 2.5
@@ -139,16 +203,28 @@
       }
     },
     {
+      "params": [
+        {
+          "name": "hover_point",
+          "select": {
+            "type": "point",
+            "fields": [
+              "band"
+            ],
+            "on": "pointerover",
+            "clear": "pointerout"
+          }
+        }
+      ],
       "mark": {
         "type": "circle",
-        "size": 70,
-        "opacity": 1
+        "size": 70
       },
       "encoding": {
         "tooltip": [
           {
             "field": "band",
-            "title": "Time band"
+            "title": "Period"
           },
           {
             "field": "Fin_year",
@@ -158,12 +234,25 @@
             "field": "entries",
             "type": "quantitative",
             "format": ",.0f",
-            "title": "Weekday entries"
+            "title": "Average daily entries"
           }
         ]
       }
     },
     {
+      "params": [
+        {
+          "name": "hover_label",
+          "select": {
+            "type": "point",
+            "fields": [
+              "band"
+            ],
+            "on": "pointerover",
+            "clear": "pointerout"
+          }
+        }
+      ],
       "transform": [
         {
           "filter": "datum.Fin_year == 'FY24-25'"
@@ -207,3 +296,4 @@
     }
   ]
 }
+

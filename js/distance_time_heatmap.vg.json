@@ -1,0 +1,112 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": {
+    "text": "Where and when weekday travel recovered",
+    "subtitle": [
+      "Change in average normal weekday entries, FY2018-19 to FY2024-25, by distance from Flinders Street and time of day.",
+      "Colour compares each cell with the change across the whole network: blue held up better, red fell further."
+    ]
+  },
+  "data": {
+    "url": "data/station_entries.csv",
+    "format": {
+      "type": "csv",
+      "parse": {
+        "Stop_lat": "number",
+        "Stop_long": "number",
+        "Pax_pre_AM_peak": "number",
+        "Pax_AM_peak": "number",
+        "Pax_interpeak": "number",
+        "Pax_PM_peak": "number",
+        "Pax_PM_late": "number"
+      }
+    }
+  },
+  "transform": [
+    {"filter": "datum.Fin_year == 'FY18-19' || datum.Fin_year == 'FY24-25'"},
+    {
+      "calculate": "sqrt(pow((datum.Stop_long - 144.9671) * 0.790 * 111.32, 2) + pow((datum.Stop_lat + 37.8183) * 110.57, 2))",
+      "as": "km"
+    },
+    {
+      "calculate": "datum.km < 5 ? 'Under 5 km' : datum.km < 10 ? '5 to 10 km' : datum.km < 15 ? '10 to 15 km' : datum.km < 20 ? '15 to 20 km' : datum.km < 30 ? '20 to 30 km' : '30 km and over'",
+      "as": "distance"
+    },
+    {
+      "fold": ["Pax_pre_AM_peak", "Pax_AM_peak", "Pax_interpeak", "Pax_PM_peak", "Pax_PM_late"],
+      "as": ["band_field", "entries"]
+    },
+    {
+      "calculate": "datum.band_field == 'Pax_pre_AM_peak' ? 'Pre-AM peak' : datum.band_field == 'Pax_AM_peak' ? 'AM peak' : datum.band_field == 'Pax_interpeak' ? 'Interpeak' : datum.band_field == 'Pax_PM_peak' ? 'PM peak' : 'PM late'",
+      "as": "band"
+    },
+    {
+      "aggregate": [{"op": "sum", "field": "entries", "as": "entries"}],
+      "groupby": ["Fin_year", "distance", "band"]
+    },
+    {
+      "joinaggregate": [{"op": "sum", "field": "entries", "as": "network"}],
+      "groupby": ["Fin_year"]
+    },
+    {
+      "window": [
+        {"op": "lag", "field": "entries", "as": "entries_2019"},
+        {"op": "lag", "field": "network", "as": "network_2019"}
+      ],
+      "groupby": ["distance", "band"],
+      "sort": [{"field": "Fin_year"}]
+    },
+    {"filter": "datum.Fin_year == 'FY24-25'"},
+    {"calculate": "datum.entries / datum.entries_2019 - 1", "as": "change"},
+    {"calculate": "datum.change - (datum.network / datum.network_2019 - 1)", "as": "vs_network"}
+  ],
+  "width": 460,
+  "height": 260,
+  "encoding": {
+    "x": {
+      "field": "band",
+      "type": "nominal",
+      "sort": ["Pre-AM peak", "AM peak", "Interpeak", "PM peak", "PM late"],
+      "title": null,
+      "axis": {"orient": "top", "labelAngle": 0, "domain": false, "ticks": false}
+    },
+    "y": {
+      "field": "distance",
+      "type": "nominal",
+      "sort": ["Under 5 km", "5 to 10 km", "10 to 15 km", "15 to 20 km", "20 to 30 km", "30 km and over"],
+      "title": "Distance from Flinders Street",
+      "axis": {"domain": false, "ticks": false}
+    }
+  },
+  "layer": [
+    {
+      "mark": {"type": "rect", "stroke": "white", "strokeWidth": 2},
+      "encoding": {
+        "color": {
+          "field": "vs_network",
+          "type": "quantitative",
+          "scale": {"scheme": "redblue", "domainMid": 0},
+          "legend": {"title": "Change vs network", "format": "+.0%", "orient": "right"}
+        },
+        "tooltip": [
+          {"field": "distance", "title": "Distance"},
+          {"field": "band", "title": "Time band"},
+          {"field": "entries_2019", "type": "quantitative", "format": ",.0f", "title": "Weekday entries FY2018-19"},
+          {"field": "entries", "type": "quantitative", "format": ",.0f", "title": "Weekday entries FY2024-25"},
+          {"field": "change", "type": "quantitative", "format": "+.0%", "title": "Change"},
+          {"field": "vs_network", "type": "quantitative", "format": "+.0%", "title": "Vs network"}
+        ]
+      }
+    },
+    {
+      "mark": {"type": "text", "fontSize": 12},
+      "encoding": {
+        "text": {"field": "change", "type": "quantitative", "format": "+.0%"},
+        "color": {
+          "condition": {"test": "abs(datum.vs_network) > 0.12", "value": "white"},
+          "value": "black"
+        }
+      }
+    }
+  ]
+}

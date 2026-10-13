@@ -2,10 +2,11 @@
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "title": {
     "text": "Metropolitan patronage by mode",
-    "subtitle": "Monthly boardings in millions. Dashed lines show each mode's 2019 monthly average."
+    "subtitle": [
+      "Monthly boardings in millions. Dashed lines show each mode's 2019 monthly average.",
+      "Drag across the lower strip to zoom."
+    ]
   },
-  "width": 600,
-  "height": 300,
   "data": {
     "url": "data/monthly_mode.csv",
     "format": {
@@ -26,34 +27,85 @@
     {"calculate": "datum.pax / 1000000", "as": "pax_m"},
     {"calculate": "datum.mode == 'Metropolitan train' ? 'Train' : datum.mode == 'Metropolitan tram' ? 'Tram' : 'Bus'", "as": "mode_label"}
   ],
-  "encoding": {
-    "color": {
-      "field": "mode_label",
-      "type": "nominal",
-      "title": null,
-      "scale": {"domain": ["Train", "Tram", "Bus"], "range": ["#0072CE", "#78BE20", "#FF8200"]},
-      "legend": {"orient": "top", "direction": "horizontal"}
-    }
-  },
-  "layer": [
+  "resolve": {"legend": {"color": "independent"}},
+  "vconcat": [
     {
-      "transform": [
-        {"filter": "datum.Year == 2019"},
-        {"aggregate": [{"op": "mean", "field": "pax_m", "as": "avg2019"}], "groupby": ["mode_label"]}
-      ],
-      "mark": {"type": "rule", "strokeDash": [4, 4], "opacity": 0.6},
-      "encoding": {"y": {"field": "avg2019", "type": "quantitative"}}
+      "name": "main",
+      "width": 600,
+      "height": 300,
+      "encoding": {
+        "color": {
+          "field": "mode_label",
+          "type": "nominal",
+          "title": null,
+          "scale": {"domain": ["Train", "Tram", "Bus"], "range": ["#0072CE", "#78BE20", "#FF8200"]},
+          "legend": {"orient": "top", "direction": "horizontal"}
+        }
+      },
+      "layer": [
+        {
+          "params": [
+            {"name": "mode_pick", "select": {"type": "point", "fields": ["mode_label"]}, "bind": "legend"}
+          ],
+          "mark": {"type": "line", "strokeWidth": 2, "clip": true},
+          "encoding": {
+            "x": {
+              "field": "date",
+              "type": "temporal",
+              "title": null,
+              "axis": {"format": "%b %Y"},
+              "scale": {"domain": {"param": "brush"}}
+            },
+            "y": {"field": "pax_m", "type": "quantitative", "title": "Monthly patronage (millions)"},
+            "opacity": {"condition": {"param": "mode_pick", "value": 1}, "value": 0.15}
+          }
+        },
+        {
+          "transform": [
+            {"filter": "datum.Year == 2019"},
+            {"aggregate": [{"op": "mean", "field": "pax_m", "as": "avg2019"}], "groupby": ["mode_label"]}
+          ],
+          "mark": {"type": "rule", "strokeDash": [4, 4]},
+          "encoding": {
+            "y": {"field": "avg2019", "type": "quantitative"},
+            "opacity": {"condition": {"param": "mode_pick", "value": 0.6}, "value": 0.15}
+          }
+        },
+        {
+          "transform": [{"pivot": "mode_label", "value": "pax", "groupby": ["date"]}],
+          "params": [
+            {
+              "name": "hover",
+              "select": {"type": "point", "fields": ["date"], "nearest": true, "on": "pointerover", "clear": "pointerout"}
+            }
+          ],
+          "mark": {"type": "rule", "clip": true},
+          "encoding": {
+            "x": {"field": "date", "type": "temporal", "scale": {"domain": {"param": "brush"}}},
+            "color": {"value": "#888888"},
+            "opacity": {"condition": {"param": "hover", "empty": false, "value": 1}, "value": 0},
+            "tooltip": [
+              {"field": "date", "type": "temporal", "format": "%b %Y", "title": "Month"},
+              {"field": "Train", "type": "quantitative", "format": ","},
+              {"field": "Tram", "type": "quantitative", "format": ","},
+              {"field": "Bus", "type": "quantitative", "format": ","}
+            ]
+          }
+        }
+      ]
     },
     {
-      "mark": {"type": "line", "strokeWidth": 2},
+      "name": "overview",
+      "width": 600,
+      "height": 60,
+      "params": [
+        {"name": "brush", "select": {"type": "interval", "encodings": ["x"]}}
+      ],
+      "mark": {"type": "line", "strokeWidth": 1},
       "encoding": {
         "x": {"field": "date", "type": "temporal", "title": null, "axis": {"format": "%Y"}},
-        "y": {"field": "pax_m", "type": "quantitative", "title": "Monthly patronage (millions)"},
-        "tooltip": [
-          {"field": "mode_label", "type": "nominal", "title": "Mode"},
-          {"field": "date", "type": "temporal", "format": "%b %Y", "title": "Month"},
-          {"field": "pax", "type": "quantitative", "format": ",", "title": "Boardings"}
-        ]
+        "y": {"field": "pax_m", "type": "quantitative", "title": null, "axis": {"tickCount": 2, "grid": false}},
+        "color": {"field": "mode_label", "type": "nominal", "legend": null}
       }
     }
   ]
