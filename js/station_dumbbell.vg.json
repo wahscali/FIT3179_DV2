@@ -1,0 +1,74 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": {
+    "text": "Melbourne's 20 busiest stations, before and after",
+    "subtitle": "Annual entries, sorted by change since FY2018-19. CBD stations count entries only, so most of their trips are homeward."
+  },
+  "width": 520,
+  "height": {"step": 22},
+  "data": {"url": "data/station_change.csv"},
+  "transform": [
+    {
+      "window": [{"op": "row_number", "as": "rank"}],
+      "sort": [{"field": "pax_2019", "order": "descending"}]
+    },
+    {"filter": "datum.rank <= 20"}
+  ],
+  "encoding": {
+    "y": {
+      "field": "Stop_name",
+      "type": "nominal",
+      "sort": {"field": "change", "op": "min", "order": "descending"},
+      "title": null
+    }
+  },
+  "layer": [
+    {
+      "mark": {"type": "rule", "color": "#c8c8c8", "strokeWidth": 2},
+      "encoding": {
+        "x": {
+          "field": "pax_2019",
+          "type": "quantitative",
+          "title": "Annual station entries",
+          "axis": {"format": "~s"}
+        },
+        "x2": {"field": "pax_2025"}
+      }
+    },
+    {
+      "transform": [{"fold": ["pax_2019", "pax_2025"], "as": ["year", "entries"]}],
+      "mark": {"type": "circle", "size": 90, "opacity": 1},
+      "encoding": {
+        "x": {
+          "field": "entries",
+          "type": "quantitative",
+          "title": "Annual station entries",
+          "axis": {"format": "~s"}
+        },
+        "color": {
+          "field": "year",
+          "type": "nominal",
+          "scale": {"domain": ["pax_2019", "pax_2025"], "range": ["#b0b0b0", "#2b5c8a"]},
+          "legend": {
+            "title": null,
+            "orient": "top",
+            "labelExpr": "datum.label == 'pax_2019' ? 'FY2018-19' : 'FY2024-25'"
+          }
+        },
+        "tooltip": [
+          {"field": "Stop_name", "title": "Station"},
+          {"field": "pax_2019", "type": "quantitative", "format": ",", "title": "Entries FY2018-19"},
+          {"field": "pax_2025", "type": "quantitative", "format": ",", "title": "Entries FY2024-25"},
+          {"field": "change", "type": "quantitative", "format": "+.0%", "title": "Change"}
+        ]
+      }
+    },
+    {
+      "mark": {"type": "text", "align": "left", "fontSize": 11},
+      "encoding": {
+        "x": {"value": 530},
+        "text": {"field": "change", "type": "quantitative", "format": "+.0%"}
+      }
+    }
+  ]
+}

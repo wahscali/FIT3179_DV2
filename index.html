@@ -10,15 +10,23 @@
 </head>
 <body>
   <h1>Melbourne's network recovered its riders, not its rhythm</h1>
-
+  <h2> Monthly mode</h2>
   <div id="monthly_mode"></div>
-
+  <h2> Station map</h2>
   <div id="station_map"></div>
+  <h2> Station dumbbell</h2>
+  <div id="station_dumbbell"></div>
+  <h2> Time band slope</h2>
+  <div id="time_band_slope"></div>
 
   <script>
     vegaEmbed('#monthly_mode', 'js/monthly_mode.vg.json', {actions: false})
       .catch(console.error);
     vegaEmbed('#station_map', 'js/station_map.vg.json', {actions: false})
+      .catch(console.error);
+    vegaEmbed('#station_dumbbell', 'js/station_dumbbell.vg.json', {actions: false})
+      .catch(console.error);
+    vegaEmbed('#time_band_slope', 'js/time_band_slope.vg.json', {actions: false})
       .catch(console.error);
   </script>
 </body>

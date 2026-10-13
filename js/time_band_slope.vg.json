@@ -1,0 +1,209 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": {
+  "text": "Weekday travel by time of day, before and after",
+  "subtitle": [
+    "Entries on an average normal weekday (excluding school holidays), all metro stations combined.",
+    " ",
+    "Pre-AM peak: midnight to 7am    AM peak: 7am to 9:30am    Interpeak: 9:30am to 3pm",
+    "PM peak: 3pm to 7pm    PM late: 7pm to midnight"
+  ],
+  "subtitlePadding": 6
+},
+  "width": 300,
+  "height": 380,
+  "data": {
+    "url": "data/station_entries.csv",
+    "format": {
+      "type": "csv",
+      "parse": {
+        "Pax_pre_AM_peak": "number",
+        "Pax_AM_peak": "number",
+        "Pax_interpeak": "number",
+        "Pax_PM_peak": "number",
+        "Pax_PM_late": "number"
+      }
+    }
+  },
+  "transform": [
+    {
+      "filter": "datum.Fin_year == 'FY18-19' || datum.Fin_year == 'FY24-25'"
+    },
+    {
+      "fold": [
+        "Pax_pre_AM_peak",
+        "Pax_AM_peak",
+        "Pax_interpeak",
+        "Pax_PM_peak",
+        "Pax_PM_late"
+      ],
+      "as": [
+        "band_field",
+        "entries"
+      ]
+    },
+    {
+      "aggregate": [
+        {
+          "op": "sum",
+          "field": "entries",
+          "as": "entries"
+        }
+      ],
+      "groupby": [
+        "Fin_year",
+        "band_field"
+      ]
+    },
+    {
+      "calculate": "datum.band_field == 'Pax_pre_AM_peak' ? 'Pre-AM peak' : datum.band_field == 'Pax_AM_peak' ? 'AM peak' : datum.band_field == 'Pax_interpeak' ? 'Interpeak' : datum.band_field == 'Pax_PM_peak' ? 'PM peak' : 'PM late'",
+      "as": "band"
+    },
+    {
+      "window": [
+        {
+          "op": "lag",
+          "field": "entries",
+          "as": "entries_2019"
+        }
+      ],
+      "groupby": [
+        "band"
+      ],
+      "sort": [
+        {
+          "field": "Fin_year"
+        }
+      ]
+    },
+    {
+      "calculate": "datum.entries / datum.entries_2019 - 1",
+      "as": "change"
+    }
+  ],
+  "encoding": {
+    "x": {
+      "field": "Fin_year",
+      "type": "ordinal",
+      "title": null,
+      "scale": {
+        "padding": 0.2
+      },
+      "axis": {
+        "labelAngle": 0,
+        "labelExpr": "datum.label == 'FY18-19' ? 'FY2018-19' : 'FY2024-25'",
+        "domain": false,
+        "ticks": false
+      }
+    },
+    "y": {
+      "field": "entries",
+      "type": "quantitative",
+      "title": "Weekday entries",
+      "axis": {
+        "format": "~s"
+      }
+    },
+    "color": {
+      "field": "band",
+      "type": "nominal",
+      "scale": {
+        "domain": [
+          "Pre-AM peak",
+          "AM peak",
+          "Interpeak",
+          "PM peak",
+          "PM late"
+        ],
+        "range": [
+          "#8c8c8c",
+          "#b2182b",
+          "#2166ac",
+          "#e08214",
+          "#5e3c99"
+        ]
+      },
+      "legend": null
+    }
+  },
+  "layer": [
+    {
+      "mark": {
+        "type": "line",
+        "strokeWidth": 2.5
+      },
+      "encoding": {
+        "detail": {
+          "field": "band"
+        }
+      }
+    },
+    {
+      "mark": {
+        "type": "circle",
+        "size": 70,
+        "opacity": 1
+      },
+      "encoding": {
+        "tooltip": [
+          {
+            "field": "band",
+            "title": "Time band"
+          },
+          {
+            "field": "Fin_year",
+            "title": "Year"
+          },
+          {
+            "field": "entries",
+            "type": "quantitative",
+            "format": ",.0f",
+            "title": "Weekday entries"
+          }
+        ]
+      }
+    },
+    {
+      "transform": [
+        {
+          "filter": "datum.Fin_year == 'FY24-25'"
+        },
+        {
+          "calculate": "datum.band + '  ' + format(datum.change, '+.0%')",
+          "as": "label"
+        }
+      ],
+      "mark": {
+        "type": "text",
+        "align": "left",
+        "dx": 10,
+        "fontSize": 11
+      },
+      "encoding": {
+        "text": {
+          "field": "label"
+        }
+      }
+    },
+    {
+      "transform": [
+        {
+          "filter": "datum.Fin_year == 'FY18-19'"
+        }
+      ],
+      "mark": {
+        "type": "text",
+        "align": "right",
+        "dx": -10,
+        "fontSize": 11
+      },
+      "encoding": {
+        "text": {
+          "field": "entries",
+          "type": "quantitative",
+          "format": ".3~s"
+        }
+      }
+    }
+  ]
+}
