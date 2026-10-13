@@ -20,6 +20,8 @@
   <div id="distance_time_heatmap"></div>
   <h2> Public transport Share</h2>
   <div id="sa3_pt_share"></div>
+  <h2> line change map</h2>
+  <div id="line_change_map"></div>
   <script>
     vegaEmbed('#monthly_mode', 'js/monthly_mode.vg.json', {actions: false})
       .catch(console.error);
@@ -30,6 +32,8 @@
     vegaEmbed('#distance_time_heatmap', 'js/distance_time_heatmap.vg.json', {actions: false})
       .catch(console.error);
     vegaEmbed('#sa3_pt_share', 'js/sa3_pt_share.vg.json', {actions: false})
+      .catch(console.error);
+    vegaEmbed('#line_change_map', 'js/line_change_map.vg.json', {actions: false})
       .catch(console.error);
   </script>
 </body>
