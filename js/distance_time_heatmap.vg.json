@@ -20,98 +20,28 @@
     }
   },
   "transform": [
-    {
-      "filter": "datum.Fin_year == 'FY18-19' || datum.Fin_year == 'FY24-25'"
-    },
-    {
-      "calculate": "sqrt(pow((datum.Stop_long - 144.9671) * 0.790 * 111.32, 2) + pow((datum.Stop_lat + 37.8183) * 110.57, 2))",
-      "as": "km"
-    },
+    {"filter": "datum.Fin_year == 'FY18-19' || datum.Fin_year == 'FY24-25'"},
+    {"calculate": "sqrt(pow((datum.Stop_long - 144.9671) * 0.790 * 111.32, 2) + pow((datum.Stop_lat + 37.8183) * 110.57, 2))", "as": "km"},
     {
       "calculate": "datum.km < 5 ? 'Under 5 km' : datum.km < 10 ? '5 to 10 km' : datum.km < 15 ? '10 to 15 km' : datum.km < 20 ? '15 to 20 km' : datum.km < 30 ? '20 to 30 km' : '30 km and over'",
       "as": "distance"
     },
-    {
-      "fold": [
-        "Pax_pre_AM_peak",
-        "Pax_AM_peak",
-        "Pax_interpeak",
-        "Pax_PM_peak",
-        "Pax_PM_late"
-      ],
-      "as": [
-        "band_field",
-        "entries"
-      ]
-    },
+    {"fold": ["Pax_pre_AM_peak", "Pax_AM_peak", "Pax_interpeak", "Pax_PM_peak", "Pax_PM_late"], "as": ["band_field", "entries"]},
     {
       "calculate": "datum.band_field == 'Pax_pre_AM_peak' ? 'Pre-AM peak' : datum.band_field == 'Pax_AM_peak' ? 'AM peak' : datum.band_field == 'Pax_interpeak' ? 'Interpeak' : datum.band_field == 'Pax_PM_peak' ? 'PM peak' : 'PM late'",
       "as": "band"
     },
+    {"aggregate": [{"op": "sum", "field": "entries", "as": "entries"}], "groupby": ["Fin_year", "distance", "band"]},
+    {"joinaggregate": [{"op": "sum", "field": "entries", "as": "network"}], "groupby": ["Fin_year"]},
     {
-      "aggregate": [
-        {
-          "op": "sum",
-          "field": "entries",
-          "as": "entries"
-        }
-      ],
-      "groupby": [
-        "Fin_year",
-        "distance",
-        "band"
-      ]
+      "window": [{"op": "lag", "field": "entries", "as": "entries_2019"}, {"op": "lag", "field": "network", "as": "network_2019"}],
+      "groupby": ["distance", "band"],
+      "sort": [{"field": "Fin_year"}]
     },
-    {
-      "joinaggregate": [
-        {
-          "op": "sum",
-          "field": "entries",
-          "as": "network"
-        }
-      ],
-      "groupby": [
-        "Fin_year"
-      ]
-    },
-    {
-      "window": [
-        {
-          "op": "lag",
-          "field": "entries",
-          "as": "entries_2019"
-        },
-        {
-          "op": "lag",
-          "field": "network",
-          "as": "network_2019"
-        }
-      ],
-      "groupby": [
-        "distance",
-        "band"
-      ],
-      "sort": [
-        {
-          "field": "Fin_year"
-        }
-      ]
-    },
-    {
-      "filter": "datum.Fin_year == 'FY24-25'"
-    },
-    {
-      "calculate": "datum.entries / datum.entries_2019 - 1",
-      "as": "change"
-    },
-    {
-      "calculate": "datum.network / datum.network_2019 - 1",
-      "as": "network_change"
-    },
-    {
-      "calculate": "datum.change - datum.network_change",
-      "as": "vs_network"
-    }
+    {"filter": "datum.Fin_year == 'FY24-25'"},
+    {"calculate": "datum.entries / datum.entries_2019 - 1", "as": "change"},
+    {"calculate": "datum.network / datum.network_2019 - 1", "as": "network_change"},
+    {"calculate": "datum.change - datum.network_change", "as": "vs_network"}
   ],
   "width": 460,
   "height": 260,
@@ -119,127 +49,49 @@
     "x": {
       "field": "band",
       "type": "nominal",
-      "sort": [
-        "Pre-AM peak",
-        "AM peak",
-        "Interpeak",
-        "PM peak",
-        "PM late"
-      ],
+      "sort": ["Pre-AM peak", "AM peak", "Interpeak", "PM peak", "PM late"],
       "title": null,
-      "axis": {
-        "orient": "top",
-        "labelAngle": 0,
-        "domain": false,
-        "ticks": false
-      }
+      "axis": {"orient": "top", "labelAngle": 0, "domain": false, "ticks": false}
     },
     "y": {
       "field": "distance",
       "type": "nominal",
-      "sort": [
-        "Under 5 km",
-        "5 to 10 km",
-        "10 to 15 km",
-        "15 to 20 km",
-        "20 to 30 km",
-        "30 km and over"
-      ],
+      "sort": ["Under 5 km", "5 to 10 km", "10 to 15 km", "15 to 20 km", "20 to 30 km", "30 km and over"],
       "title": "Distance from Flinders Street",
-      "axis": {
-        "domain": false,
-        "ticks": false
-      }
+      "axis": {"domain": false, "ticks": false}
     }
   },
   "layer": [
     {
-      "mark": {
-        "type": "rect",
-        "stroke": "white",
-        "strokeWidth": 2
-      },
+      "mark": {"type": "rect", "stroke": "white", "strokeWidth": 2},
       "encoding": {
         "color": {
           "field": "vs_network",
           "type": "quantitative",
-          "scale": {
-            "scheme": "redblue",
-            "domain": [
-              -0.15,
-              0.15
-            ],
-            "clamp": true
-          },
+          "scale": {"scheme": "redblue", "domain": [-0.15, 0.15], "clamp": true},
           "legend": {
-            "title": [
-              "Compared with",
-              "the network"
-            ],
+            "title": ["Compared with", "the network"],
             "orient": "right",
-            "values": [
-              -0.15,
-              0,
-              0.15
-            ],
+            "values": [-0.15, 0, 0.15],
             "labelExpr": "datum.value == 0 ? 'Same (−26%)' : datum.value > 0 ? 'Held up better' : 'Fell further'",
             "gradientLength": 180
           }
         },
         "tooltip": [
-          {
-            "field": "distance",
-            "title": "Distance"
-          },
-          {
-            "field": "band",
-            "title": "Time band"
-          },
-          {
-            "field": "entries_2019",
-            "type": "quantitative",
-            "format": ",.0f",
-            "title": "Weekday entries FY2018-19"
-          },
-          {
-            "field": "entries",
-            "type": "quantitative",
-            "format": ",.0f",
-            "title": "Weekday entries FY2024-25"
-          },
-          {
-            "field": "change",
-            "type": "quantitative",
-            "format": "+.0%",
-            "title": "Change in this cell"
-          },
-          {
-            "field": "network_change",
-            "type": "quantitative",
-            "format": "+.0%",
-            "title": "Change across whole network"
-          }
+          {"field": "distance", "title": "Distance"},
+          {"field": "band", "title": "Time band"},
+          {"field": "entries_2019", "type": "quantitative", "format": ",.0f", "title": "Weekday entries FY2018-19"},
+          {"field": "entries", "type": "quantitative", "format": ",.0f", "title": "Weekday entries FY2024-25"},
+          {"field": "change", "type": "quantitative", "format": "+.0%", "title": "Change in this cell"},
+          {"field": "network_change", "type": "quantitative", "format": "+.0%", "title": "Change across whole network"}
         ]
       }
     },
     {
-      "mark": {
-        "type": "text",
-        "fontSize": 12
-      },
+      "mark": {"type": "text", "fontSize": 12},
       "encoding": {
-        "text": {
-          "field": "change",
-          "type": "quantitative",
-          "format": "+.0%"
-        },
-        "color": {
-          "condition": {
-            "test": "abs(datum.vs_network) > 0.09",
-            "value": "white"
-          },
-          "value": "black"
-        }
+        "text": {"field": "change", "type": "quantitative", "format": "+.0%"},
+        "color": {"condition": {"test": "abs(datum.vs_network) > 0.09", "value": "white"}, "value": "black"}
       }
     }
   ]

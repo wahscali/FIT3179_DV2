@@ -2,68 +2,45 @@
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "title": {
     "text": "Regional trains now carry more people than before COVID; Melbourne's trains and trams are still a fifth down",
-    "subtitle": "Annual patronage, FY2024-25 compared with FY2018-19. Each row has its own scale, so compare each bar with its own tick.",
+    "subtitle": [
+      "Bar: annual patronage FY2024-25. Black tick: FY2018-19 level. Each row has its own scale.",
+      "Grey shading marks 75%, 100% and 125% of the FY2018-19 level."
+    ],
     "offset": 16
   },
-  "spacing": 42,
-  "vconcat": [
-    {
-      "title": {"text": "How to read each row (shading: share of the FY2018-19 level)", "fontSize": 11, "fontWeight": "normal", "color": "#555", "anchor": "start", "offset": 26},
-      "width": 440,
-      "height": 26,
-      "data": {"values": [{"b75": 75, "b100": 100, "b125": 125, "now": 85}]},
-      "encoding": {"x": {"type": "quantitative", "scale": {"domain": [0, 125]}, "axis": null}},
-      "layer": [
-        {"mark": {"type": "bar", "color": "#e6e6e6", "height": 26}, "encoding": {"x": {"field": "b125"}}},
-        {"mark": {"type": "bar", "color": "#d0d0d0", "height": 26}, "encoding": {"x": {"field": "b100"}}},
-        {"mark": {"type": "bar", "color": "#b8b8b8", "height": 26}, "encoding": {"x": {"field": "b75"}}},
-        {"mark": {"type": "bar", "color": "#777", "height": 10}, "encoding": {"x": {"field": "now"}}},
-        {"mark": {"type": "tick", "color": "black", "thickness": 2.5, "size": 22}, "encoding": {"x": {"field": "b100"}}},
-        {"mark": {"type": "text", "align": "right", "dx": -4, "dy": -22}, "encoding": {"x": {"field": "now"}, "text": {"value": "Bar: FY2024-25 patronage"}}},
-        {"mark": {"type": "text", "align": "left", "dx": 4, "dy": -22, "fontWeight": "bold"}, "encoding": {"x": {"field": "b100"}, "text": {"value": "Tick: FY2018-19 level"}}},
-        {
-          "data": {"values": [{"x": 37.5, "t": "below 75%"}, {"x": 87.5, "t": "75 to 100%"}, {"x": 112.5, "t": "100 to 125%"}]},
-          "mark": {"type": "text", "dy": 24, "fontSize": 10, "color": "#555"},
-          "encoding": {"x": {"field": "x"}, "text": {"field": "t"}}
-        }
-      ]
-    },
-    {
-      "data": {"url": "data/mode_recovery.csv"},
-      "facet": {
-        "row": {
-          "field": "mode", "title": null,
-          "sort": ["Metro train", "Tram", "Metro bus", "V/Line train", "V/Line coach", "Regional bus"],
-          "header": {"labelAngle": 0, "labelAlign": "right", "labelFontSize": 12, "labelPadding": 8}
+  "data": {"url": "data/mode_recovery.csv"},
+  "facet": {
+    "row": {
+      "field": "mode", "title": null,
+      "sort": ["Metro train", "Tram", "Metro bus", "V/Line train", "V/Line coach", "Regional bus"],
+      "header": {"labelAngle": 0, "labelAlign": "right", "labelFontSize": 12, "labelPadding": 8}
+    }
+  },
+  "spacing": 10,
+  "resolve": {"scale": {"x": "independent"}},
+  "spec": {
+    "width": 440,
+    "height": 26,
+    "encoding": {"x": {"type": "quantitative", "title": null, "scale": {"nice": false}, "axis": {"format": "~s", "tickCount": 4}}},
+    "layer": [
+      {"mark": {"type": "bar", "color": "#e6e6e6"}, "encoding": {"x": {"field": "band_125"}}},
+      {"mark": {"type": "bar", "color": "#d0d0d0"}, "encoding": {"x": {"field": "band_100"}}},
+      {"mark": {"type": "bar", "color": "#b8b8b8"}, "encoding": {"x": {"field": "band_75"}}},
+      {
+        "mark": {"type": "bar", "height": 10},
+        "encoding": {
+          "x": {"field": "fy2025"},
+          "color": {"field": "network", "scale": {"range": ["#2b5c8a", "#5e3c99"]}, "legend": {"title": null, "orient": "top"}},
+          "tooltip": [
+            {"field": "mode", "title": "Mode"},
+            {"field": "fy2019", "format": ",", "title": "Patronage FY2018-19"},
+            {"field": "fy2025", "format": ",", "title": "Patronage FY2024-25"},
+            {"field": "change", "format": "+.0%", "title": "Change"}
+          ]
         }
       },
-      "spacing": 10,
-      "resolve": {"scale": {"x": "independent"}},
-      "spec": {
-        "width": 440,
-        "height": 26,
-        "encoding": {"x": {"type": "quantitative", "title": null, "scale": {"nice": false}, "axis": {"format": "~s", "tickCount": 4}}},
-        "layer": [
-          {"mark": {"type": "bar", "color": "#e6e6e6"}, "encoding": {"x": {"field": "band_125"}}},
-          {"mark": {"type": "bar", "color": "#d0d0d0"}, "encoding": {"x": {"field": "band_100"}}},
-          {"mark": {"type": "bar", "color": "#b8b8b8"}, "encoding": {"x": {"field": "band_75"}}},
-          {
-            "mark": {"type": "bar", "height": 10},
-            "encoding": {
-              "x": {"field": "fy2025"},
-              "color": {"field": "network", "scale": {"range": ["#2b5c8a", "#5e3c99"]}, "legend": {"title": null, "orient": "top"}},
-              "tooltip": [
-                {"field": "mode", "title": "Mode"},
-                {"field": "fy2019", "format": ",", "title": "Patronage FY2018-19"},
-                {"field": "fy2025", "format": ",", "title": "Patronage FY2024-25"},
-                {"field": "change", "format": "+.0%", "title": "Change"}
-              ]
-            }
-          },
-          {"mark": {"type": "tick", "color": "black", "thickness": 2.5, "size": 22}, "encoding": {"x": {"field": "fy2019"}}},
-          {"mark": {"type": "text", "align": "left", "fontSize": 12, "fontWeight": "bold"}, "encoding": {"x": {"value": 448}, "text": {"field": "change", "format": "+.0%"}}}
-        ]
-      }
-    }
-  ]
+      {"mark": {"type": "tick", "color": "black", "thickness": 2.5, "size": 22}, "encoding": {"x": {"field": "fy2019"}}},
+      {"mark": {"type": "text", "align": "left", "fontSize": 12, "fontWeight": "bold"}, "encoding": {"x": {"value": 448}, "text": {"field": "change", "format": "+.0%"}}}
+    ]
+  }
 }

@@ -110,32 +110,15 @@
               }
             },
             {
-              "name": "city_labels_right",
+              "name": "city_labels",
               "data": {"url": "data/station_change.csv"},
-              "transform": [{"filter": "datum.label_side == 'right'"}],
-              "mark": {"type": "text", "align": "left", "dx": 7, "fontSize": 8, "clip": true},
-              "encoding": {
-                "longitude": {"field": "Stop_long", "type": "quantitative"},
-                "latitude": {"field": "Stop_lat", "type": "quantitative"},
-                "text": {"field": "Stop_name"}
-              }
-            },
-            {
-              "name": "city_labels_left",
-              "data": {"url": "data/station_change.csv"},
-              "transform": [{"filter": "datum.label_side == 'left'"}],
-              "mark": {"type": "text", "align": "right", "dx": -7, "fontSize": 8, "clip": true},
-              "encoding": {
-                "longitude": {"field": "Stop_long", "type": "quantitative"},
-                "latitude": {"field": "Stop_lat", "type": "quantitative"},
-                "text": {"field": "Stop_name"}
-              }
-            },
-            {
-              "name": "city_labels_top",
-              "data": {"url": "data/station_change.csv"},
-              "transform": [{"filter": "datum.label_side == 'top'"}],
-              "mark": {"type": "text", "dy": -11, "fontSize": 8, "clip": true},
+              "transform": [{"filter": "datum.label_side"}],
+              "mark": {
+                "type": "text", "fontSize": 8, "clip": true,
+                "align": {"expr": "datum.label_side == 'right' ? 'left' : datum.label_side == 'left' ? 'right' : 'center'"},
+                "dx": {"expr": "datum.label_side == 'right' ? 7 : datum.label_side == 'left' ? -7 : 0"},
+                "dy": {"expr": "datum.label_side == 'top' ? -11 : 0"}
+              },
               "encoding": {
                 "longitude": {"field": "Stop_long", "type": "quantitative"},
                 "latitude": {"field": "Stop_lat", "type": "quantitative"},

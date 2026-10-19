@@ -44,18 +44,10 @@
       },
       "layer": [
         {
-          "params": [
-            {"name": "mode_pick", "select": {"type": "point", "fields": ["mode_label"]}, "bind": "legend"}
-          ],
+          "params": [{"name": "mode_pick", "select": {"type": "point", "fields": ["mode_label"]}, "bind": "legend"}],
           "mark": {"type": "line", "strokeWidth": 2, "clip": true},
           "encoding": {
-            "x": {
-              "field": "date",
-              "type": "temporal",
-              "title": null,
-              "axis": {"format": "%b %Y"},
-              "scale": {"domain": {"param": "brush"}}
-            },
+            "x": {"field": "date", "type": "temporal", "title": null, "axis": {"format": "%b %Y"}, "scale": {"domain": {"param": "brush"}}},
             "y": {"field": "pax_m", "type": "quantitative", "title": "Monthly patronage (millions)"},
             "opacity": {"condition": {"param": "mode_pick", "value": 1}, "value": 0.15}
           }
@@ -74,10 +66,7 @@
         {
           "transform": [{"pivot": "mode_label", "value": "pax", "groupby": ["date"]}],
           "params": [
-            {
-              "name": "hover",
-              "select": {"type": "point", "fields": ["date"], "nearest": true, "on": "pointerover", "clear": "pointerout"}
-            }
+            {"name": "hover", "select": {"type": "point", "fields": ["date"], "nearest": true, "on": "pointerover", "clear": "pointerout"}}
           ],
           "mark": {"type": "rule", "clip": true},
           "encoding": {
@@ -98,9 +87,7 @@
       "name": "overview",
       "width": 600,
       "height": 60,
-      "params": [
-        {"name": "brush", "select": {"type": "interval", "encodings": ["x"]}}
-      ],
+      "params": [{"name": "brush", "select": {"type": "interval", "encodings": ["x"]}}],
       "mark": {"type": "line", "strokeWidth": 1},
       "encoding": {
         "x": {"field": "date", "type": "temporal", "title": null, "axis": {"format": "%Y"}},

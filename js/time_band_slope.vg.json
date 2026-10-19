@@ -12,18 +12,7 @@
   "width": 300,
   "height": 380,
   "params": [
-    {
-      "name": "view",
-      "value": "Time of day",
-      "bind": {
-        "input": "radio",
-        "options": [
-          "Time of day",
-          "Day of week"
-        ],
-        "name": "Compare by: "
-      }
-    }
+    {"name": "view", "value": "Time of day", "bind": {"input": "radio", "options": ["Time of day", "Day of week"], "name": "Compare by: "}}
   ],
   "data": {
     "url": "data/station_entries.csv",
@@ -42,258 +31,77 @@
     }
   },
   "transform": [
+    {"filter": "datum.Fin_year == 'FY18-19' || datum.Fin_year == 'FY24-25'"},
     {
-      "filter": "datum.Fin_year == 'FY18-19' || datum.Fin_year == 'FY24-25'"
+      "fold": ["Pax_pre_AM_peak", "Pax_AM_peak", "Pax_interpeak", "Pax_PM_peak", "Pax_PM_late", "Pax_weekday", "Pax_Saturday", "Pax_Sunday"],
+      "as": ["band_field", "entries"]
     },
-    {
-      "fold": [
-        "Pax_pre_AM_peak",
-        "Pax_AM_peak",
-        "Pax_interpeak",
-        "Pax_PM_peak",
-        "Pax_PM_late",
-        "Pax_weekday",
-        "Pax_Saturday",
-        "Pax_Sunday"
-      ],
-      "as": [
-        "band_field",
-        "entries"
-      ]
-    },
-    {
-      "aggregate": [
-        {
-          "op": "sum",
-          "field": "entries",
-          "as": "entries"
-        }
-      ],
-      "groupby": [
-        "Fin_year",
-        "band_field"
-      ]
-    },
+    {"aggregate": [{"op": "sum", "field": "entries", "as": "entries"}], "groupby": ["Fin_year", "band_field"]},
     {
       "calculate": "datum.band_field == 'Pax_weekday' || datum.band_field == 'Pax_Saturday' || datum.band_field == 'Pax_Sunday' ? 'Day of week' : 'Time of day'",
       "as": "group"
     },
-    {
-      "filter": "datum.group == view"
-    },
+    {"filter": "datum.group == view"},
     {
       "calculate": "{'Pax_pre_AM_peak': 'Pre-AM peak', 'Pax_AM_peak': 'AM peak', 'Pax_interpeak': 'Interpeak', 'Pax_PM_peak': 'PM peak', 'Pax_PM_late': 'PM late', 'Pax_weekday': 'Weekday', 'Pax_Saturday': 'Saturday', 'Pax_Sunday': 'Sunday'}[datum.band_field]",
       "as": "band"
     },
-    {
-      "window": [
-        {
-          "op": "lag",
-          "field": "entries",
-          "as": "entries_2019"
-        }
-      ],
-      "groupby": [
-        "band"
-      ],
-      "sort": [
-        {
-          "field": "Fin_year"
-        }
-      ]
-    },
-    {
-      "calculate": "datum.entries / datum.entries_2019 - 1",
-      "as": "change"
-    }
+    {"window": [{"op": "lag", "field": "entries", "as": "entries_2019"}], "groupby": ["band"], "sort": [{"field": "Fin_year"}]},
+    {"calculate": "datum.entries / datum.entries_2019 - 1", "as": "change"}
   ],
   "encoding": {
     "x": {
       "field": "Fin_year",
       "type": "ordinal",
       "title": null,
-      "scale": {
-        "padding": 0.2
-      },
-      "axis": {
-        "labelAngle": 0,
-        "labelExpr": "datum.label == 'FY18-19' ? 'FY2018-19' : 'FY2024-25'",
-        "domain": false,
-        "ticks": false
-      }
+      "scale": {"padding": 0.2},
+      "axis": {"labelAngle": 0, "labelExpr": "datum.label == 'FY18-19' ? 'FY2018-19' : 'FY2024-25'", "domain": false, "ticks": false}
     },
-    "y": {
-      "field": "entries",
-      "type": "quantitative",
-      "title": "Average daily entries",
-      "axis": {
-        "format": "~s"
-      }
-    },
+    "y": {"field": "entries", "type": "quantitative", "title": "Average daily entries", "axis": {"format": "~s"}},
     "color": {
       "field": "band",
       "type": "nominal",
       "scale": {
-        "domain": [
-          "Pre-AM peak",
-          "AM peak",
-          "Interpeak",
-          "PM peak",
-          "PM late",
-          "Weekday",
-          "Saturday",
-          "Sunday"
-        ],
-        "range": [
-          "#8c8c8c",
-          "#b2182b",
-          "#2166ac",
-          "#e08214",
-          "#5e3c99",
-          "#1b7837",
-          "#c51b7d",
-          "#8c510a"
-        ]
+        "domain": ["Pre-AM peak", "AM peak", "Interpeak", "PM peak", "PM late", "Weekday", "Saturday", "Sunday"],
+        "range": ["#8c8c8c", "#b2182b", "#2166ac", "#e08214", "#5e3c99", "#1b7837", "#c51b7d", "#8c510a"]
       },
       "legend": null
     },
     "opacity": {
-      "condition": {
-        "test": {
-          "and": [
-            {
-              "param": "hover_line"
-            },
-            {
-              "param": "hover_point"
-            },
-            {
-              "param": "hover_label"
-            }
-          ]
-        },
-        "value": 1
-      },
+      "condition": {"test": {"and": [{"param": "hover_line"}, {"param": "hover_point"}, {"param": "hover_label"}]}, "value": 1},
       "value": 0.2
     }
   },
   "layer": [
     {
-      "params": [
-        {
-          "name": "hover_line",
-          "select": {
-            "type": "point",
-            "fields": [
-              "band"
-            ],
-            "on": "pointerover",
-            "clear": "pointerout"
-          }
-        }
-      ],
-      "mark": {
-        "type": "line",
-        "strokeWidth": 2.5
-      },
-      "encoding": {
-        "detail": {
-          "field": "band"
-        }
-      }
+      "params": [{"name": "hover_line", "select": {"type": "point", "fields": ["band"], "on": "pointerover", "clear": "pointerout"}}],
+      "mark": {"type": "line", "strokeWidth": 2.5},
+      "encoding": {"detail": {"field": "band"}}
     },
     {
-      "params": [
-        {
-          "name": "hover_point",
-          "select": {
-            "type": "point",
-            "fields": [
-              "band"
-            ],
-            "on": "pointerover",
-            "clear": "pointerout"
-          }
-        }
-      ],
-      "mark": {
-        "type": "circle",
-        "size": 70
-      },
+      "params": [{"name": "hover_point", "select": {"type": "point", "fields": ["band"], "on": "pointerover", "clear": "pointerout"}}],
+      "mark": {"type": "circle", "size": 70},
       "encoding": {
         "tooltip": [
-          {
-            "field": "band",
-            "title": "Period"
-          },
-          {
-            "field": "Fin_year",
-            "title": "Year"
-          },
-          {
-            "field": "entries",
-            "type": "quantitative",
-            "format": ",.0f",
-            "title": "Average daily entries"
-          }
+          {"field": "band", "title": "Period"},
+          {"field": "Fin_year", "title": "Year"},
+          {"field": "entries", "type": "quantitative", "format": ",.0f", "title": "Average daily entries"}
         ]
       }
     },
     {
-      "params": [
-        {
-          "name": "hover_label",
-          "select": {
-            "type": "point",
-            "fields": [
-              "band"
-            ],
-            "on": "pointerover",
-            "clear": "pointerout"
-          }
-        }
-      ],
+      "params": [{"name": "hover_label", "select": {"type": "point", "fields": ["band"], "on": "pointerover", "clear": "pointerout"}}],
       "transform": [
-        {
-          "filter": "datum.Fin_year == 'FY24-25'"
-        },
-        {
-          "calculate": "datum.band + '  ' + format(datum.change, '+.0%')",
-          "as": "label"
-        }
+        {"filter": "datum.Fin_year == 'FY24-25'"},
+        {"calculate": "datum.band + '  ' + format(datum.change, '+.0%')", "as": "label"}
       ],
-      "mark": {
-        "type": "text",
-        "align": "left",
-        "dx": 10,
-        "fontSize": 11
-      },
-      "encoding": {
-        "text": {
-          "field": "label"
-        }
-      }
+      "mark": {"type": "text", "align": "left", "dx": 10, "fontSize": 11},
+      "encoding": {"text": {"field": "label"}}
     },
     {
-      "transform": [
-        {
-          "filter": "datum.Fin_year == 'FY18-19'"
-        }
-      ],
-      "mark": {
-        "type": "text",
-        "align": "right",
-        "dx": -10,
-        "fontSize": 11
-      },
-      "encoding": {
-        "text": {
-          "field": "entries",
-          "type": "quantitative",
-          "format": ".3~s"
-        }
-      }
+      "transform": [{"filter": "datum.Fin_year == 'FY18-19'"}],
+      "mark": {"type": "text", "align": "right", "dx": -10, "fontSize": 11},
+      "encoding": {"text": {"field": "entries", "type": "quantitative", "format": ".3~s"}}
     }
   ]
 }
-

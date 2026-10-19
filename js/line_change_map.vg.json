@@ -10,136 +10,51 @@
   },
   "width": 560,
   "height": 560,
-  "projection": {
-    "type": "mercator"
-  },
+  "projection": {"type": "mercator"},
   "layer": [
     {
-      "data": {
-        "url": "data/metro_lines_change.topojson",
-        "format": {
-          "type": "topojson",
-          "feature": "shared_track"
-        }
-      },
-      "mark": {
-        "type": "geoshape",
-        "filled": false,
-        "stroke": "#9a9a9a",
-        "strokeWidth": 1.5,
-        "strokeDash": [
-          4,
-          3
-        ]
-      }
+      "data": {"url": "data/metro_lines_change.topojson", "format": {"type": "topojson", "feature": "shared_track"}},
+      "mark": {"type": "geoshape", "filled": false, "stroke": "#9a9a9a", "strokeWidth": 1.5, "strokeDash": [4, 3]}
     },
     {
-      "data": {
-        "url": "data/metro_lines_change.topojson",
-        "format": {
-          "type": "topojson",
-          "feature": "own_track"
-        }
-      },
-      "mark": {
-        "type": "geoshape",
-        "filled": false,
-        "strokeCap": "round",
-        "strokeWidth": 3.5
-      },
+      "data": {"url": "data/metro_lines_change.topojson", "format": {"type": "topojson", "feature": "own_track"}},
+      "mark": {"type": "geoshape", "filled": false, "strokeCap": "round", "strokeWidth": 3.5},
       "encoding": {
         "stroke": {
           "field": "properties.change",
           "type": "quantitative",
-          "scale": {
-            "scheme": "redyellowblue",
-            "domain": [
-              -0.45,
-              -0.01
-            ],
-            "clamp": true
-          },
+          "scale": {"scheme": "redyellowblue", "domain": [-0.45, -0.01], "clamp": true},
           "legend": {
-            "title": [
-              "Change in entries",
-              "(network −23%)"
-            ],
+            "title": ["Change in entries", "(network −23%)"],
             "format": "+.0%",
-            "values": [
-              -0.4,
-              -0.3,
-              -0.23,
-              -0.1,
-              0
-            ],
+            "values": [-0.4, -0.3, -0.23, -0.1, 0],
             "labelExpr": "datum.value == -0.23 ? '−23% (network)' : datum.value == 0 ? '0% or more' : datum.label"
           }
         },
         "tooltip": [
-          {
-            "field": "properties.line",
-            "title": "Line"
-          },
-          {
-            "field": "properties.change",
-            "type": "quantitative",
-            "format": "+.0%",
-            "title": "Change in entries"
-          },
-          {
-            "field": "properties.pax_2019",
-            "type": "quantitative",
-            "format": ",",
-            "title": "Entries FY2018-19"
-          },
-          {
-            "field": "properties.pax_2025",
-            "type": "quantitative",
-            "format": ",",
-            "title": "Entries FY2024-25"
-          },
-          {
-            "field": "properties.stations",
-            "title": "Stations counted"
-          }
+          {"field": "properties.line", "title": "Line"},
+          {"field": "properties.change", "type": "quantitative", "format": "+.0%", "title": "Change in entries"},
+          {"field": "properties.pax_2019", "type": "quantitative", "format": ",", "title": "Entries FY2018-19"},
+          {"field": "properties.pax_2025", "type": "quantitative", "format": ",", "title": "Entries FY2024-25"},
+          {"field": "properties.stations", "title": "Stations counted"}
         ]
       }
     },
     {
-      "data": {
-        "url": "data/metro_lines_change.topojson",
-        "format": {
-          "type": "topojson",
-          "feature": "labels"
-        }
-      },
+      "data": {"url": "data/metro_lines_change.topojson", "format": {"type": "topojson", "feature": "labels"}},
       "mark": {
         "type": "text",
         "fontSize": 10,
-        "align": {
-          "expr": "datum.properties.align"
-        },
-        "dx": {
-          "expr": "datum.properties.dx"
-        },
-        "dy": {
-          "expr": "datum.properties.dy"
-        },
+        "align": {"expr": "datum.properties.align"},
+        "dx": {"expr": "datum.properties.dx"},
+        "dy": {"expr": "datum.properties.dy"},
         "lineBreak": "\n",
         "baseline": "middle"
       },
       "encoding": {
-        "longitude": {
-          "field": "properties.lon",
-          "type": "quantitative"
-        },
-        "latitude": {
-          "field": "properties.lat",
-          "type": "quantitative"
-        },
-        "text": {
-          "field": "properties.label"
-        }
+        "longitude": {"field": "properties.lon", "type": "quantitative"},
+        "latitude": {"field": "properties.lat", "type": "quantitative"},
+        "text": {"field": "properties.label"}
       }
     }
   ]
