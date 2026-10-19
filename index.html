@@ -10,6 +10,8 @@
 </head>
 <body>
   <h1>Melbourne's network recovered its riders, not its rhythm</h1>
+  <h2> Capital city comparison</h2>
+  <div id="capital_lollipop"></div>
   <h2> Monthly mode</h2>
   <div id="monthly_mode"></div>
   <h2> Station map</h2>
@@ -22,9 +24,13 @@
   <div id="sa3_pt_share"></div>
   <h2> line change map</h2>
   <div id="line_change_map"></div>
+  <h2> Station treemap</h2>
+  <div id="station_treemap"></div>
   <h2> Line recovery</h2>
   <div id="mode_bullet"></div>
   <script>
+    vegaEmbed('#capital_lollipop', 'js/capital_lollipop.vg.json', {actions: false})
+      .catch(console.error);
     vegaEmbed('#monthly_mode', 'js/monthly_mode.vg.json', {actions: false})
       .catch(console.error);
     vegaEmbed('#station_map', 'js/station_map.vg.json', {actions: false})
@@ -36,6 +42,8 @@
     vegaEmbed('#sa3_pt_share', 'js/sa3_pt_share.vg.json', {actions: false})
       .catch(console.error);
     vegaEmbed('#line_change_map', 'js/line_change_map.vg.json', {actions: false})
+      .catch(console.error);
+    vegaEmbed('#station_treemap', 'js/station_treemap.vg.json', {actions: false})
       .catch(console.error);
     vegaEmbed('#mode_bullet', 'js/mode_bullet.vg.json', {actions: false})
       .catch(console.error);

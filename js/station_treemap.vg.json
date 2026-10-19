@@ -1,0 +1,60 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": {
+    "text": "The five city stations still handle almost a third of all entries, and they lost the most",
+    "subtitle": [
+      "Each box is a station, sized by annual entries in FY2024-25 and grouped by line. Stations served by several lines are grouped separately.",
+      "Colour compares each station's change since FY2018-19 with the whole network (all days: −23%). Stony Point line is too small to show. Hover for details."
+    ],
+    "offset": 12
+  },
+  "width": 820,
+  "height": 520,
+  "data": {"url": "data/treemap.csv"},
+  "encoding": {
+    "x": {"field": "x", "type": "quantitative", "scale": {"domain": [0, 820], "nice": false}, "axis": null},
+    "y": {"field": "y", "type": "quantitative", "scale": {"domain": [0, 520], "nice": false, "reverse": true}, "axis": null}
+  },
+  "layer": [
+    {
+      "transform": [{"filter": "datum.level == 'station'"}],
+      "mark": {"type": "rect", "stroke": "white", "strokeWidth": 0.5},
+      "encoding": {
+        "x2": {"field": "x2"}, "y2": {"field": "y2"},
+        "color": {
+          "field": "rel", "type": "quantitative", "title": ["Change compared", "with network"],
+          "scale": {"scheme": "redblue", "domain": [-0.3, 0.3], "clamp": true},
+          "legend": {"format": "+.0%", "values": [-0.3, -0.15, 0, 0.15, 0.3], "labelExpr": "datum.value == 0 ? 'Same as network' : datum.label"}
+        },
+        "tooltip": [
+          {"field": "name", "title": "Station"},
+          {"field": "group", "title": "Group"},
+          {"field": "pax_2019", "type": "quantitative", "format": ",", "title": "Entries FY2018-19"},
+          {"field": "pax_2025", "type": "quantitative", "format": ",", "title": "Entries FY2024-25"},
+          {"field": "change", "type": "quantitative", "format": "+.0%", "title": "Change"}
+        ]
+      }
+    },
+    {
+      "transform": [{"filter": "datum.level == 'line'"}],
+      "mark": {"type": "rect", "fill": null, "stroke": "white", "strokeWidth": 3},
+      "encoding": {"x2": {"field": "x2"}, "y2": {"field": "y2"}}
+    },
+    {
+      "transform": [{"filter": "datum.level == 'line' && datum.label"}],
+      "mark": {
+        "type": "text", "align": "left", "baseline": "top", "dx": 4, "dy": 2, "fontWeight": "bold",
+        "fontSize": {"expr": "datum.fs"}, "limit": {"expr": "datum.x2 - datum.x - 6"}
+      },
+      "encoding": {"text": {"field": "label"}}
+    },
+    {
+      "transform": [{"filter": "datum.level == 'station' && datum.label"}],
+      "mark": {"type": "text", "align": "left", "baseline": "top", "dx": 3, "dy": 3, "fontSize": 9},
+      "encoding": {
+        "text": {"field": "label"},
+        "color": {"condition": {"test": "abs(datum.rel) > 0.15", "value": "white"}, "value": "#222"}
+      }
+    }
+  ]
+}

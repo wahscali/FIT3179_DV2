@@ -1,0 +1,55 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": {
+    "text": "Melbourne has recovered less public transport travel than any other capital city",
+    "subtitle": [
+      "Change in public transport trips (train, tram or light rail, bus and ferry), FY2018-19 to FY2024-25.",
+      "Dashed line: all eight capital cities combined (−10%). Source: BITRE Yearbook 2025, Table 2.5."
+    ],
+    "offset": 12
+  },
+  "width": 480,
+  "height": {"step": 30},
+  "data": {"url": "data/capital_recovery.csv"},
+  "encoding": {
+    "x": {"type": "quantitative", "title": "Change in trips", "scale": {"domain": [-0.24, 0.08]}, "axis": {"format": "+.0%"}}
+  },
+  "layer": [
+    {"mark": {"type": "rule", "color": "#333"}, "encoding": {"x": {"datum": 0}}},
+    {"mark": {"type": "rule", "color": "#888", "strokeDash": [4, 3]}, "encoding": {"x": {"datum": -0.101}}},
+    {
+      "mark": {"type": "rule", "strokeWidth": 2.5},
+      "encoding": {
+        "y": {"field": "city", "type": "nominal", "sort": ["Melbourne", "Hobart", "Darwin", "Sydney", "Adelaide", "Canberra", "Brisbane", "Perth"], "title": null},
+        "x": {"field": "change"}, "x2": {"datum": 0},
+        "color": {"condition": {"test": "datum.city == 'Melbourne'", "value": "#b2182b"}, "value": "#b0b0b0"}
+      }
+    },
+    {
+      "mark": {"type": "circle", "size": 140, "opacity": 1},
+      "encoding": {
+        "y": {"field": "city", "type": "nominal", "sort": ["Melbourne", "Hobart", "Darwin", "Sydney", "Adelaide", "Canberra", "Brisbane", "Perth"], "title": null},
+        "x": {"field": "change"},
+        "color": {"condition": {"test": "datum.city == 'Melbourne'", "value": "#b2182b"}, "value": "#808080"},
+        "tooltip": [
+          {"field": "city", "title": "City"},
+          {"field": "trips_2019", "type": "quantitative", "format": ",.1f", "title": "Trips FY2018-19 (millions)"},
+          {"field": "trips_2025", "type": "quantitative", "format": ",.1f", "title": "Trips FY2024-25 (millions)"},
+          {"field": "change", "type": "quantitative", "format": "+.0%", "title": "Change"}
+        ]
+      }
+    },
+    {
+      "mark": {
+        "type": "text", "fontSize": 11, "align": {"expr": "datum.change < 0 ? 'right' : 'left'"},
+        "dx": {"expr": "datum.change < 0 ? -10 : 10"},
+        "fontWeight": {"expr": "datum.city == 'Melbourne' ? 'bold' : 'normal'"}
+      },
+      "encoding": {
+        "y": {"field": "city", "type": "nominal", "sort": ["Melbourne", "Hobart", "Darwin", "Sydney", "Adelaide", "Canberra", "Brisbane", "Perth"], "title": null},
+        "x": {"field": "change"},
+        "text": {"field": "change", "type": "quantitative", "format": "+.1%"}
+      }
+    }
+  ]
+}
