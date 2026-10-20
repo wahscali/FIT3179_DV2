@@ -1,14 +1,15 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "title": {
-    "text": "Melbourne has recovered less public transport travel than any other capital city",
+    "text": ["Melbourne has recovered less public transport travel", "than any other capital city"],
     "subtitle": [
-      "Change in public transport trips (train, tram or light rail, bus and ferry), FY2018-19 to FY2024-25.",
-      "Dashed line: all eight capital cities combined (−10%). Source: BITRE Yearbook 2025, Table 2.5."
+      "Change in public transport trips, FY2018-19 to FY2024-25.",
+      "Train, tram or light rail, bus and ferry combined.",
+      "Dashed line: all eight capitals combined. Source: BITRE Yearbook 2025."
     ],
-    "offset": 12
+    "offset": 26
   },
-  "width": 480,
+  "width": 600,
   "height": {"step": 30},
   "data": {"url": "data/capital_recovery.csv"},
   "encoding": {
@@ -50,6 +51,9 @@
         "x": {"field": "change"},
         "text": {"field": "change", "type": "quantitative", "format": "+.1%"}
       }
-    }
+    },
+    {"mark": {"type": "text", "align": "center", "dy": -24, "fontStyle": "italic", "color": "#5b6675"}, "encoding": {"x": {"datum": -0.101}, "y": {"datum": "Melbourne"}, "text": {"value": "All capitals −10%"}}},
+    {"mark": {"type": "text", "align": "left", "dx": 8, "dy": -6, "fontWeight": "bold", "color": "#b2182b"}, "encoding": {"x": {"datum": 0}, "y": {"datum": "Melbourne"}, "text": {"value": "105.7 million fewer"}}},
+    {"mark": {"type": "text", "align": "left", "dx": 8, "dy": 7, "color": "#5b6675"}, "encoding": {"x": {"datum": 0}, "y": {"datum": "Melbourne"}, "text": {"value": "trips a year"}}}
   ]
 }

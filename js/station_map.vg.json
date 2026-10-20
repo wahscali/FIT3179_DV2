@@ -22,8 +22,9 @@
       "title": {
         "text": "The south-east corridor gained ground while the north-east fell behind",
         "subtitle": [
-          "Station entries FY2024-25. Colour compares each station's change since FY2018-19 with the network as a whole (-23%).",
-          "Click a station to highlight it in the maps and the chart below. Double click to clear."
+          "Circle size: station entries FY2024-25.",
+          "Colour: change since FY2018-19 compared with the whole network (−23%).",
+          "Click a station to highlight it everywhere. Double click to clear."
         ]
       },
       "resolve": {"scale": {"color": "shared", "size": "shared"}},
@@ -69,11 +70,21 @@
                   {"field": "change", "type": "quantitative", "format": "+.0%", "title": "Change"}
                 ]
               }
+            },
+            {
+              "name": "map_notes",
+              "data": {"values": [
+                {"lon": 145.2635, "lat": -38.079, "t": "Merinda Park +88%,", "w": "bold", "dy": 24},
+                {"lon": 145.2635, "lat": -38.079, "t": "the biggest gain on the network", "w": "normal", "dy": 37},
+                {"lon": 145.4110, "lat": -38.066, "t": "Officer +70%", "w": "bold", "dy": -14}
+              ]},
+              "mark": {"type": "text", "align": "left", "dx": -4, "dy": {"expr": "datum.dy"}, "fontWeight": {"expr": "datum.w"}, "color": "#2166ac", "clip": true},
+              "encoding": {"longitude": {"field": "lon", "type": "quantitative"}, "latitude": {"field": "lat", "type": "quantitative"}, "text": {"field": "t"}}
             }
           ]
         },
         {
-          "title": {"text": "City detail", "fontSize": 12},
+          "title": {"text": "City detail", "fontSize": 12, "fontWeight": 600, "subtitle": null},
           "width": 300,
           "height": 300,
           "projection": {"type": "mercator", "center": [144.97, -37.815], "scale": 250000, "translate": [150, 150]},
@@ -198,7 +209,7 @@
             "color": {
               "field": "year",
               "type": "nominal",
-              "scale": {"domain": ["pax_2019", "pax_2025"], "range": ["#b0b0b0", "#2b5c8a"]},
+              "scale": {"domain": ["pax_2019", "pax_2025"], "range": ["#b0b0b0", "#0072ce"]},
               "legend": {
                 "title": null,
                 "orient": "top",

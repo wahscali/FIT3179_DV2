@@ -4,23 +4,42 @@
     "text": ["In 2016, one in three inner-city workers commuted by public transport;", "on the fringe it was fewer than one in ten"],
     "subtitle": ["Share of people travelling to work who used train, tram, bus or ferry,", "by SA3 (Statistical Area 3). Census 2016."]
   },
-  "width": 520,
+  "width": 600,
   "height": 460,
-  "data": {"url": "data/melb_sa3_pt.topojson", "format": {"type": "topojson", "feature": "melb_sa3"}},
   "projection": {"type": "mercator"},
-  "mark": {"type": "geoshape", "stroke": "white", "strokeWidth": 0.7},
-  "encoding": {
-    "color": {
-      "field": "properties.pt_share",
-      "type": "quantitative",
-      "scale": {"scheme": "purples", "domain": [0, 0.4]},
-      "legend": {"title": ["Public transport", "share"], "format": ".0%", "orient": "right"}
+  "layer": [
+    {
+      "data": {"url": "data/melb_sa3_pt.topojson", "format": {"type": "topojson", "feature": "melb_sa3"}},
+      "mark": {"type": "geoshape", "stroke": "white", "strokeWidth": 0.7},
+      "encoding": {
+        "color": {
+          "field": "properties.pt_share",
+          "type": "quantitative",
+          "scale": {"scheme": "purples", "domain": [0, 0.4]},
+          "legend": {"title": ["Public transport", "share"], "format": ".0%", "orient": "right"}
+        },
+        "tooltip": [
+          {"field": "properties.sa3_name_2016", "title": "Area (SA3)"},
+          {"field": "properties.pt_share", "type": "quantitative", "format": ".0%", "title": "Public transport share"},
+          {"field": "properties.pt_commuters", "type": "quantitative", "format": ",", "title": "Public transport commuters"},
+          {"field": "properties.travelled_to_work", "type": "quantitative", "format": ",", "title": "All who travelled to work"}
+        ]
+      }
     },
-    "tooltip": [
-      {"field": "properties.sa3_name_2016", "title": "Area (SA3)"},
-      {"field": "properties.pt_share", "type": "quantitative", "format": ".0%", "title": "Public transport share"},
-      {"field": "properties.pt_commuters", "type": "quantitative", "format": ",", "title": "Public transport commuters"},
-      {"field": "properties.travelled_to_work", "type": "quantitative", "format": ",", "title": "All who travelled to work"}
-    ]
-  }
+    {
+      "data": {"values": [{"lon": 144.962, "lat": -37.818, "lon2": 144.87, "lat2": -38.03}]},
+      "mark": {"type": "rule", "color": "#3f007d", "strokeWidth": 1},
+      "encoding": {"longitude": {"field": "lon", "type": "quantitative"}, "latitude": {"field": "lat", "type": "quantitative"}, "longitude2": {"field": "lon2"}, "latitude2": {"field": "lat2"}}
+    },
+    {
+      "data": {"values": [
+        {"lon": 144.87, "lat": -38.03, "t": "Melbourne City", "w": "bold", "dy": 8},
+        {"lon": 144.87, "lat": -38.03, "t": "36% by public transport", "w": "normal", "dy": 21},
+        {"lon": 144.62, "lat": -38.36, "t": "Mornington Peninsula", "w": "bold", "dy": 0},
+        {"lon": 144.62, "lat": -38.36, "t": "3%, the lowest share", "w": "normal", "dy": 13}
+      ]},
+      "mark": {"type": "text", "align": "center", "dy": {"expr": "datum.dy"}, "fontWeight": {"expr": "datum.w"}, "color": "#3f007d"},
+      "encoding": {"longitude": {"field": "lon", "type": "quantitative"}, "latitude": {"field": "lat", "type": "quantitative"}, "text": {"field": "t"}}
+    }
+  ]
 }

@@ -1,10 +1,11 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "title": {
-    "text": "Only the growth-area lines in the south-east carry more passengers than before COVID",
+    "text": ["Only the growth-area lines in the south-east", "carry more passengers than before COVID"],
     "subtitle": [
-      "Change in annual station entries, FY2018-19 to FY2024-25, at stations served by only one line.",
-      "Dashed grey: shared track, where stations serve several lines and are left out. Whole network, all days: −23%."
+      "Change in annual station entries, FY2018-19 to FY2024-25,",
+      "at stations served by only one line. Whole network, all days: −23%.",
+      "Dashed grey: shared track. Its stations serve several lines and are left out."
     ],
     "offset": 18
   },
@@ -45,6 +46,7 @@
       "mark": {
         "type": "text",
         "fontSize": 10,
+        "fontWeight": {"expr": "datum.properties.change >= 0 || indexof(['Cranbourne', 'Pakenham'], datum.properties.line) >= 0 ? 'bold' : 'normal'"},
         "align": {"expr": "datum.properties.align"},
         "dx": {"expr": "datum.properties.dx"},
         "dy": {"expr": "datum.properties.dy"},

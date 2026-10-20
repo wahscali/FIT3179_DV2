@@ -1,10 +1,11 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "title": {
-    "text": "Regional trains now carry more people than before COVID; Melbourne's trains and trams are still a fifth down",
+    "text": ["Regional trains now carry more people than before COVID;", "Melbourne's trains and trams are still a fifth down"],
     "subtitle": [
-      "Bar: annual patronage FY2024-25. Black tick: FY2018-19 level. Each row has its own scale.",
-      "Grey shading marks 75%, 100% and 125% of the FY2018-19 level."
+      "Bar: annual patronage FY2024-25. Black tick: FY2018-19 level.",
+      "Grey shading marks 75%, 100% and 125% of the FY2018-19 level.",
+      "Each row has its own scale."
     ],
     "offset": 16
   },
@@ -13,13 +14,13 @@
     "row": {
       "field": "mode", "title": null,
       "sort": ["Metro train", "Tram", "Metro bus", "V/Line train", "V/Line coach", "Regional bus"],
-      "header": {"labelAngle": 0, "labelAlign": "right", "labelFontSize": 12, "labelPadding": 8}
+      "header": {"labelAngle": 0, "labelAlign": "right", "labelPadding": 8}
     }
   },
   "spacing": 10,
   "resolve": {"scale": {"x": "independent"}},
   "spec": {
-    "width": 440,
+    "width": 560,
     "height": 26,
     "encoding": {"x": {"type": "quantitative", "title": null, "scale": {"nice": false}, "axis": {"format": "~s", "tickCount": 4}}},
     "layer": [
@@ -30,7 +31,7 @@
         "mark": {"type": "bar", "height": 10},
         "encoding": {
           "x": {"field": "fy2025"},
-          "color": {"field": "network", "scale": {"range": ["#2b5c8a", "#5e3c99"]}, "legend": {"title": null, "orient": "top"}},
+          "color": {"field": "network", "scale": {"range": ["#0072ce", "#8f1a95"]}, "legend": {"title": null, "orient": "top"}},
           "tooltip": [
             {"field": "mode", "title": "Mode"},
             {"field": "fy2019", "format": ",", "title": "Patronage FY2018-19"},
@@ -40,7 +41,7 @@
         }
       },
       {"mark": {"type": "tick", "color": "black", "thickness": 2.5, "size": 22}, "encoding": {"x": {"field": "fy2019"}}},
-      {"mark": {"type": "text", "align": "left", "fontSize": 12, "fontWeight": "bold"}, "encoding": {"x": {"value": 448}, "text": {"field": "change", "format": "+.0%"}}}
+      {"mark": {"type": "text", "align": "left", "fontWeight": "bold"}, "encoding": {"x": {"value": 568}, "text": {"field": "change", "format": "+.0%"}, "color": {"condition": {"test": "datum.change > 0", "value": "#2166ac"}, "value": "#b2182b"}}}
     ]
   }
 }

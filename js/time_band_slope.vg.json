@@ -5,11 +5,11 @@
       "expr": "view == 'Time of day' ? 'Weekday travel by time of day, before and after' : 'Travel by day of week, before and after'"
     },
     "subtitle": {
-      "expr": "view == 'Time of day' ? ['Entries on an average normal weekday (excluding school holidays), all metro stations combined.', ' ', 'Pre-AM peak: midnight to 7am    AM peak: 7am to 9:30am    Interpeak: 9:30am to 3pm', 'PM peak: 3pm to 7pm    PM late: 7pm to midnight'] : ['Entries on an average weekday, Saturday and Sunday, all metro stations combined.', ' ', ' ', ' ']"
+      "expr": "view == 'Time of day' ? ['Average normal weekday entries (no school holidays),', 'all metro stations combined.', 'Pre-AM peak: before 7am. AM peak: 7am to 9:30am.', 'Interpeak: 9:30am to 3pm. PM peak: 3pm to 7pm.', 'PM late: 7pm to midnight.'] : ['Average entries on a weekday, Saturday and Sunday,', 'all metro stations combined.', ' ', ' ', ' ']"
     },
     "subtitlePadding": 6
   },
-  "width": 300,
+  "width": 380,
   "height": 380,
   "params": [
     {"name": "view", "value": "Time of day", "bind": {"input": "radio", "options": ["Time of day", "Day of week"], "name": "Compare by: "}}
@@ -95,12 +95,12 @@
         {"filter": "datum.Fin_year == 'FY24-25'"},
         {"calculate": "datum.band + '  ' + format(datum.change, '+.0%')", "as": "label"}
       ],
-      "mark": {"type": "text", "align": "left", "dx": 10, "fontSize": 11},
+      "mark": {"type": "text", "align": "left", "dx": 10, "fontWeight": {"expr": "indexof(['AM peak', 'Interpeak', 'Saturday'], datum.band) >= 0 ? 'bold' : 'normal'"}},
       "encoding": {"text": {"field": "label"}}
     },
     {
       "transform": [{"filter": "datum.Fin_year == 'FY18-19'"}],
-      "mark": {"type": "text", "align": "right", "dx": -10, "fontSize": 11},
+      "mark": {"type": "text", "align": "right", "dx": -10},
       "encoding": {"text": {"field": "entries", "type": "quantitative", "format": ".3~s"}}
     }
   ]

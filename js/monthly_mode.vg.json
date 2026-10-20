@@ -1,10 +1,11 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "title": {
-    "text": "Metropolitan patronage by mode",
+    "text": "Every metropolitan mode is still below its 2019 average",
     "subtitle": [
-      "Monthly boardings in millions. Dashed lines show each mode's 2019 monthly average.",
-      "Drag across the lower strip to zoom."
+      "Monthly boardings in millions, January 2018 to June 2026.",
+      "Dashed lines: each mode's 2019 monthly average.",
+      "Drag the lower strip to zoom. Click the legend to isolate a mode."
     ]
   },
   "data": {
@@ -31,7 +32,7 @@
   "vconcat": [
     {
       "name": "main",
-      "width": 600,
+      "width": 720,
       "height": 300,
       "encoding": {
         "color": {
@@ -43,6 +44,21 @@
         }
       },
       "layer": [
+        {
+          "data": {"values": [{"s": "2020-03-30", "e": "2021-10-22"}]},
+          "mark": {"type": "rect", "opacity": 0.07, "clip": true},
+          "encoding": {"x": {"field": "s", "type": "temporal", "scale": {"domain": {"param": "brush"}}}, "x2": {"field": "e"}, "color": {"value": "#13315c"}}
+        },
+        {
+          "data": {"values": [{"d": "2020-04-10", "y": 24.2, "t": "Lockdowns, 2020 to 2021", "w": "bold"}, {"d": "2020-08-01", "y": 18.3, "t": "Aug 2020: trains carried 9%", "w": "normal"}, {"d": "2020-08-01", "y": 17.1, "t": "of a normal 2019 month", "w": "normal"}]},
+          "mark": {"type": "text", "align": "left", "dx": 5, "clip": true, "fontWeight": {"expr": "datum.w"}},
+          "encoding": {"x": {"field": "d", "type": "temporal"}, "y": {"field": "y", "type": "quantitative"}, "text": {"field": "t"}, "color": {"value": "#13315c"}}
+        },
+        {
+          "data": {"values": [{"d": "2020-08-01", "y": 2.4, "y2": 18.8}]},
+          "mark": {"type": "rule", "strokeWidth": 1, "clip": true},
+          "encoding": {"x": {"field": "d", "type": "temporal"}, "y": {"field": "y", "type": "quantitative"}, "y2": {"field": "y2"}, "color": {"value": "#13315c"}}
+        },
         {
           "params": [{"name": "mode_pick", "select": {"type": "point", "fields": ["mode_label"]}, "bind": "legend"}],
           "mark": {"type": "line", "strokeWidth": 2, "clip": true},
@@ -85,12 +101,12 @@
     },
     {
       "name": "overview",
-      "width": 600,
+      "width": 720,
       "height": 60,
       "params": [{"name": "brush", "select": {"type": "interval", "encodings": ["x"]}}],
       "mark": {"type": "line", "strokeWidth": 1},
       "encoding": {
-        "x": {"field": "date", "type": "temporal", "title": null, "axis": {"format": "%Y"}},
+        "x": {"field": "date", "type": "temporal", "title": null, "axis": {"format": "%Y", "tickCount": "year"}},
         "y": {"field": "pax_m", "type": "quantitative", "title": null, "axis": {"tickCount": 2, "grid": false}},
         "color": {"field": "mode_label", "type": "nominal", "legend": null}
       }

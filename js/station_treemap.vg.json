@@ -1,10 +1,12 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "title": {
-    "text": "The five city stations still handle almost a third of all entries, and they lost the most",
+    "text": ["The five city stations still handle almost a third", "of all entries, and they lost the most"],
     "subtitle": [
-      "Each box is a station, sized by annual entries in FY2024-25 and grouped by line. Stations served by several lines are grouped separately.",
-      "Colour compares each station's change since FY2018-19 with the whole network (all days: −23%). Stony Point line is too small to show. Hover for details."
+      "Each box is a station, sized by FY2024-25 entries and grouped by line.",
+      "Stations served by several lines are grouped separately.",
+      "Colour compares each station's change with the network (−23%).",
+      "Stony Point line is too small to show. Hover for details."
     ],
     "offset": 12
   },
