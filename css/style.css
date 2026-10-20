@@ -80,6 +80,11 @@ p { max-width: 40em; }
 .notes p { max-width: 30em; margin-top: 0; }
 .hint { color: #666; }
 
+/* Wide charts: notes go underneath in columns, the same width as the chart */
+.panel.stacked { display: grid; grid-template-columns: min-content; }
+.stacked .notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0 32px; }
+.stacked .notes p { max-width: none; }
+
 /* Coloured numbers that match the charts */
 .loss { color: var(--loss); font-weight: bold; }
 .gain { color: var(--gain); font-weight: bold; }
